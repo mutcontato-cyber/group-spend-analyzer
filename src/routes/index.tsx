@@ -27,10 +27,12 @@ import {
   ShoppingBasket,
   Users,
   Wallet,
+  FolderCog,
 } from "lucide-react";
 
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, type Despesa } from "@/lib/despesas";
+import { GerenciarGrupos } from "@/components/GerenciarGrupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -91,13 +93,19 @@ const TODOS = "todos";
 const WEBHOOK_URL =
   "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha";
 
-type SectionId = "visao" | "lancamentos" | "itens" | "recebedores";
+type SectionId =
+  | "visao"
+  | "lancamentos"
+  | "itens"
+  | "recebedores"
+  | "grupos";
 
 const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: "visao", label: "Visão geral", icon: LayoutDashboard },
   { id: "lancamentos", label: "Lançamentos", icon: Receipt },
   { id: "itens", label: "Itens mais comprados", icon: ShoppingBasket },
   { id: "recebedores", label: "Recebedores", icon: Users },
+  { id: "grupos", label: "Gerenciar grupos", icon: FolderCog },
 ];
 
 function Kpi({
@@ -461,7 +469,9 @@ function Dashboard() {
           </header>
 
           <main className="space-y-5 p-4 md:p-6">
-            {isLoading ? (
+            {section === "grupos" ? (
+              <GerenciarGrupos onGruposAlterados={() => refetch()} />
+            ) : isLoading ? (
               <div className="surface-card flex items-center gap-3 p-10 text-muted-foreground">
                 <Loader2 className="size-5 animate-spin" /> Carregando
                 lançamentos...
