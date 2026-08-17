@@ -73,7 +73,7 @@ function Kpi({
   label: string;
   value: string;
   icon: React.ElementType;
-  hint?: string;
+  hint?: string | undefined;
 }) {
   return (
     <div className="surface-card p-5">
