@@ -158,11 +158,19 @@ function Dashboard() {
     select: (rows) => normalizar(rows),
   });
 
+  const { data: gruposCadastrados, refetch: refetchGrupos } = useQuery({
+    queryKey: ["grupos"],
+    queryFn: listarGrupos,
+    retry: false,
+  });
+
   const despesas: Despesa[] = data ?? [];
-  const grupos = useMemo(
-    () => Array.from(new Set(despesas.map((d) => d.grupo))).sort(),
-    [despesas],
-  );
+  const grupos = useMemo(() => {
+    const set = new Set<string>();
+    for (const g of gruposCadastrados ?? []) set.add(g.nome);
+    for (const d of despesas) if (d.grupo) set.add(d.grupo);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [despesas, gruposCadastrados]);
 
   const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
