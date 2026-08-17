@@ -159,7 +159,7 @@ function Dashboard() {
     select: (rows) => normalizar(rows),
   });
 
-  const { data: gruposCadastrados, refetch: refetchGrupos } = useQuery({
+  const { data: gruposCadastrados, refetch: refetchGrupos } = useQuery<GrupoCadastrado[]>({
     queryKey: ["grupos"],
     queryFn: listarGrupos,
     retry: false,
