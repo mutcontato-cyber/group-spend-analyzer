@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { RawDespesa } from "./despesas";
 
 const ENDPOINT =
   "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha";
 
 export const getDespesas = createServerFn({ method: "GET" }).handler(
-  async (): Promise<unknown[]> => {
+  async (): Promise<RawDespesa[]> => {
     const res = await fetch(ENDPOINT, {
       headers: { accept: "application/json" },
     });
@@ -13,11 +14,11 @@ export const getDespesas = createServerFn({ method: "GET" }).handler(
     }
     const text = await res.text();
     if (!text.trim()) return [];
-    const json = JSON.parse(text);
+    const json = JSON.parse(text) as RawDespesa[] | { data?: RawDespesa[] } | RawDespesa;
     if (Array.isArray(json)) return json;
-    if (Array.isArray((json as { data?: unknown[] }).data)) {
-      return (json as { data: unknown[] }).data;
+    if (Array.isArray((json as { data?: RawDespesa[] }).data)) {
+      return (json as { data: RawDespesa[] }).data;
     }
-    return [json];
+    return [json as RawDespesa];
   },
 );
