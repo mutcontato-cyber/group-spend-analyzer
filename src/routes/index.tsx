@@ -63,6 +63,8 @@ export const Route = createFileRoute("/")({
 });
 
 const TODOS = "todos";
+const WEBHOOK_URL =
+  "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha";
 
 function Kpi({
   label,
