@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { RawDespesa } from "./despesas";
 
 const ENDPOINT =
-  "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha";
+  "https://noiton-n8n.lm218l.easypanel.host/webhook-test/puxar-planilha";
 
 export const getDespesas = createServerFn({ method: "GET" }).handler(
   async (): Promise<RawDespesa[]> => {
