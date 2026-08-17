@@ -63,6 +63,8 @@ export const Route = createFileRoute("/")({
 });
 
 const TODOS = "todos";
+const WEBHOOK_URL =
+  "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha";
 
 function Kpi({
   label,
@@ -95,7 +97,24 @@ function Dashboard() {
   const fetchDespesas = useServerFn(getDespesas);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["despesas"],
-    queryFn: () => fetchDespesas(),
+    retry: false,
+    queryFn: async () => {
+      // 1) tenta direto do navegador (o n8n pode não ser acessível pelo servidor)
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          headers: { accept: "application/json" },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json)) return json;
+          if (Array.isArray(json?.data)) return json.data;
+        }
+      } catch {
+        /* segue para o fallback no servidor */
+      }
+      // 2) fallback via servidor (evita bloqueio de CORS)
+      return await fetchDespesas();
+    },
     select: (rows) => normalizar(rows),
   });
 
