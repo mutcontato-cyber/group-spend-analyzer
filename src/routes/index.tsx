@@ -33,6 +33,7 @@ import {
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
+import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
