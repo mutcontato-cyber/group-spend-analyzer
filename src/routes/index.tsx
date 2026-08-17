@@ -161,7 +161,7 @@ function Dashboard() {
 
   const { data: gruposCadastrados, refetch: refetchGrupos } = useQuery<GrupoCadastrado[]>({
     queryKey: ["grupos"],
-    queryFn: listarGrupos,
+    queryFn: () => listarGrupos(),
     retry: false,
   });
 
