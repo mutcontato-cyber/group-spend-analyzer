@@ -33,6 +33,7 @@ import {
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
+import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -158,11 +159,19 @@ function Dashboard() {
     select: (rows) => normalizar(rows),
   });
 
+  const { data: gruposCadastrados, refetch: refetchGrupos } = useQuery<GrupoCadastrado[]>({
+    queryKey: ["grupos"],
+    queryFn: listarGrupos,
+    retry: false,
+  });
+
   const despesas: Despesa[] = data ?? [];
-  const grupos = useMemo(
-    () => Array.from(new Set(despesas.map((d) => d.grupo))).sort(),
-    [despesas],
-  );
+  const grupos = useMemo(() => {
+    const set = new Set<string>();
+    for (const g of gruposCadastrados ?? []) set.add(g.nome);
+    for (const d of despesas) if (d.grupo) set.add(d.grupo);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [despesas, gruposCadastrados]);
 
   const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
@@ -470,7 +479,12 @@ function Dashboard() {
 
           <main className="space-y-5 p-4 md:p-6">
             {section === "grupos" ? (
-              <GerenciarGrupos onGruposAlterados={() => refetch()} />
+              <GerenciarGrupos
+                onGruposAlterados={() => {
+                  refetch();
+                  refetchGrupos();
+                }}
+              />
             ) : isLoading ? (
               <div className="surface-card flex items-center gap-3 p-10 text-muted-foreground">
                 <Loader2 className="size-5 animate-spin" /> Carregando
