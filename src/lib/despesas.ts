@@ -1,0 +1,128 @@
+export type RawDespesa = {
+  Grupo?: string | null;
+  Comprovante?: boolean | null;
+  data?: string | null;
+  hora?: string | null;
+  metodo_pagamento?: string | null;
+  valor?: string | number | null;
+  recebedor?: string | null;
+  itens?: string | null;
+  id?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Item = {
+  nome: string;
+  qtd: number | null;
+  unidade: string | null;
+  unitario: number | null;
+  total: number | null;
+};
+
+export type Despesa = {
+  id: number;
+  grupo: string;
+  comprovante: boolean;
+  data: string | null;
+  ano: number | null;
+  mes: number | null;
+  dia: number | null;
+  hora: string;
+  metodo: string;
+  valor: number;
+  recebedor: string;
+  itens: Item[];
+  itensRaw: string;
+  criadoEm: string | null;
+};
+
+const num = (v: unknown): number => {
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+  if (typeof v !== "string") return 0;
+  const cleaned = v.replace(/[^\d,.-]/g, "").replace(/\.(?=\d{3}\b)/g, "");
+  const n = parseFloat(cleaned.replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+};
+
+function parseItens(raw: string): Item[] {
+  if (!raw?.trim()) return [];
+  const hasStructured = raw.includes("Qtd:");
+  const parts = hasStructured
+    ? raw.split("\n")
+    : raw.split(/\n|,(?![^()]*\))/);
+
+  return parts
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const segs = line.split("|").map((s) => s.trim());
+      const nome = segs[0] ?? line;
+      const get = (label: string) =>
+        segs.find((s) => s.toLowerCase().startsWith(label))?.split(":")[1]?.trim() ??
+        null;
+      const qtdRaw = get("qtd");
+      const unitRaw = get("unit");
+      const totalRaw = get("total");
+      let qtd: number | null = null;
+      let unidade: string | null = null;
+      if (qtdRaw) {
+        const m = qtdRaw.match(/([\d.,]+)\s*([A-Za-zÀ-ú]*)/);
+        if (m) {
+          qtd = num(m[1]);
+          unidade = m[2] || null;
+        }
+      }
+      return {
+        nome,
+        qtd,
+        unidade,
+        unitario: unitRaw ? num(unitRaw) : null,
+        total: totalRaw ? num(totalRaw) : null,
+      };
+    });
+}
+
+export function normalizar(rows: unknown[]): Despesa[] {
+  return (rows as RawDespesa[])
+    .filter((r) => r && typeof r === "object")
+    .map((r, i) => {
+      const dataStr = (r.data ?? "").trim();
+      const m = dataStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      const itensRaw = (r.itens ?? "").trim();
+      return {
+        id: r.id ?? i,
+        grupo: (r.Grupo ?? "").trim() || "Sem grupo",
+        comprovante: Boolean(r.Comprovante),
+        data: m ? dataStr.slice(0, 10) : null,
+        ano: m ? Number(m[1]) : null,
+        mes: m ? Number(m[2]) : null,
+        dia: m ? Number(m[3]) : null,
+        hora: (r.hora ?? "").trim(),
+        metodo: (r.metodo_pagamento ?? "").trim() || "Não informado",
+        valor: num(r.valor),
+        recebedor: (r.recebedor ?? "").trim() || "Não informado",
+        itens: parseItens(itensRaw),
+        itensRaw,
+        criadoEm: r.createdAt ?? null,
+      };
+    });
+}
+
+export const MESES = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+export const brl = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
