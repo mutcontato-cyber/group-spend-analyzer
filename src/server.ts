@@ -53,7 +53,7 @@ export default {
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
+      return new Response(renderErrorPage(describeError(error)), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },
       });
