@@ -87,7 +87,19 @@ export function normalizar(rows: unknown[]): Despesa[] {
   return (rows as RawDespesa[])
     .filter((r) => r && typeof r === "object")
     .map((r, i) => {
-      const dataStr = (r.data ?? "").trim();
+      let dataStr = (r.data ?? "").trim();
+      let horaStr = (r.hora ?? "").trim();
+      // Fallback: usa createdAt quando data/hora vierem vazios
+      const criado = r.createdAt ? new Date(r.createdAt) : null;
+      const criadoValido = criado && !Number.isNaN(criado.getTime()) ? criado : null;
+      if (!dataStr && criadoValido) {
+        const p = (n: number) => String(n).padStart(2, "0");
+        dataStr = `${criadoValido.getFullYear()}-${p(criadoValido.getMonth() + 1)}-${p(criadoValido.getDate())}`;
+      }
+      if (!horaStr && criadoValido) {
+        const p = (n: number) => String(n).padStart(2, "0");
+        horaStr = `${p(criadoValido.getHours())}:${p(criadoValido.getMinutes())}:${p(criadoValido.getSeconds())}`;
+      }
       const m = dataStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
       const itensRaw = (r.itens ?? "").trim();
       return {
@@ -98,7 +110,7 @@ export function normalizar(rows: unknown[]): Despesa[] {
         ano: m ? Number(m[1]) : null,
         mes: m ? Number(m[2]) : null,
         dia: m ? Number(m[3]) : null,
-        hora: (r.hora ?? "").trim(),
+        hora: horaStr,
         metodo: (r.metodo_pagamento ?? "").trim() || "Não informado",
         valor: num(r.valor),
         recebedor: (r.recebedor ?? "").trim() || "Não informado",
@@ -108,6 +120,7 @@ export function normalizar(rows: unknown[]): Despesa[] {
       };
     });
 }
+
 
 export const MESES = [
   "Janeiro",
