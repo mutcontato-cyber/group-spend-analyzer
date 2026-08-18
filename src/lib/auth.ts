@@ -32,6 +32,7 @@ export const AUTH_ENDPOINTS = {
   enviarCodigo: `${BASE}/enviar-codigo`,
   validarCodigo: `${BASE}/validar-codigo`,
   validarSessao: `${BASE}/validar-sessao`,
+  buscarUsuario: `${BASE}/buscar-usuario`,
   listarPessoas: `${BASE}/ver-pessoas`,
   adicionarPessoa: `${BASE}/adicionar-pessoa`,
   apagarPessoa: `${BASE}/apagar-pessoa`,
