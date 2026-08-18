@@ -41,7 +41,7 @@ export const AUTH_ENDPOINTS = {
   validarSessao: `${BASE}/validar-sessao`,
   buscarUsuario: `${BASE}/buscar-usuario`,
   listarPessoas: `${BASE}/ver-pessoas`,
-  adicionarPessoa: `${BASE}/adicionar-pessoa`,
+  adicionarPessoa: `${HOST}/webhook-test/adicionar-pessoa`,
   apagarPessoa: `${BASE}/apagar-pessoa`,
 } as const;
 
