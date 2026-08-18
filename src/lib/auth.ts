@@ -77,10 +77,12 @@ export function normalizarTelefone(v: string): string {
 }
 
 export function formatarTelefone(v: string): string {
-  const d = normalizarTelefone(v).replace(/^55/, "");
-  if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-  if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-  return v;
+  const d = normalizarTelefone(v);
+  if (!d) return v;
+  const sem55 = d.replace(/^55/, "");
+  if (sem55.length === 11) return `+55 (${sem55.slice(0, 2)}) ${sem55.slice(2, 7)}-${sem55.slice(7)}`;
+  if (sem55.length === 10) return `+55 (${sem55.slice(0, 2)}) ${sem55.slice(2, 6)}-${sem55.slice(6)}`;
+  return `+55 ${d}`;
 }
 
 export function telefoneValido(v: string): boolean {

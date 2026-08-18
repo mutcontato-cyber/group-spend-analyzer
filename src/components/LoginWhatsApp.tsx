@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export function LoginWhatsApp({ onEntrar }: { onEntrar: (s: Sessao) => void }) {
   const [etapa, setEtapa] = useState<"telefone" | "codigo">("telefone");
-  const [telefone, setTelefone] = useState("");
+  const [telefone, setTelefone] = useState("55");
   const [codigo, setCodigo] = useState("");
   const [lembrar, setLembrar] = useState(true);
   const [enviando, setEnviando] = useState(false);
@@ -82,7 +82,7 @@ export function LoginWhatsApp({ onEntrar }: { onEntrar: (s: Sessao) => void }) {
                 id="telefone"
                 inputMode="tel"
                 autoFocus
-                placeholder="(00) 00000-0000"
+                placeholder="(55) 00 00000-0000"
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
                 disabled={enviando}
