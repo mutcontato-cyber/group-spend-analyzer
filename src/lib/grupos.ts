@@ -1,10 +1,9 @@
-const BASE_PROD = "https://noiton-n8n.lm218l.easypanel.host/webhook";
-const BASE_TEST = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
+const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook";
 
 export const GRUPOS_ENDPOINTS = {
-  listar: `${BASE_PROD}/ver-grupos`,
-  adicionar: `${BASE_PROD}/adicionar-grupo`,
-  apagar: "https://noiton-n8n.lm218l.easypanel.host/webhook-test/apagar-grupo",
+  listar: `${BASE}/ver-grupos`,
+  adicionar: `${BASE}/adicionar-grupo`,
+  apagar: `${BASE}/apagar-grupo`,
 } as const;
 
 
@@ -73,13 +72,8 @@ async function parseResposta(res: Response) {
   }
 }
 
-/** Tenta o webhook-test e, se ele não estiver ativo (404), usa o webhook normal. */
 async function fetchComFallback(url: string, init?: RequestInit) {
-  const res = await fetch(url, init);
-  if (res.status === 404 && url.includes("/webhook-test/")) {
-    return fetch(url.replace("/webhook-test/", "/webhook/"), init);
-  }
-  return res;
+  return fetch(url, init);
 }
 
 export async function listarGrupos(): Promise<Grupo[]> {

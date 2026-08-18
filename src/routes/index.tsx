@@ -92,7 +92,6 @@ export const Route = createFileRoute("/")({
 
 const TODOS = "todos";
 const WEBHOOK_URLS = [
-  "https://noiton-n8n.lm218l.easypanel.host/webhook-test/puxar-planilha",
   "https://noiton-n8n.lm218l.easypanel.host/webhook/puxar-planilha",
 ];
 
