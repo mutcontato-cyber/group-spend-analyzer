@@ -172,5 +172,28 @@ export const MESES = [
   "Dezembro",
 ];
 
+export const RECEBEDOR_DESCONHECIDO = new Set([
+  "Não informado",
+  "Sem comprovante",
+  "",
+]);
+
+export function recebedorEhConhecido(recebedor: string | null | undefined): boolean {
+  if (recebedor == null) return false;
+  const t = recebedor.trim();
+  return t.length > 0 && !RECEBEDOR_DESCONHECIDO.has(t);
+}
+
+export function nomesProdutos(
+  itens: Item[],
+  fallback = "Sem descrição",
+  separador = " · ",
+): string {
+  if (!itens.length) return fallback;
+  const nomes = itens.map((it) => it.nome.trim()).filter(Boolean);
+  if (!nomes.length) return fallback;
+  return Array.from(new Set(nomes)).join(separador);
+}
+
 export const brl = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
