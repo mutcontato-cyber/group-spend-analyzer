@@ -652,9 +652,9 @@ function Dashboard() {
                               )}
                             </span>
                             <span className="flex items-center gap-4 text-sm">
-                              <span className="text-muted-foreground">
-                                {d.data ?? "sem data"} {d.hora}
-                              </span>
+                            <span className="text-muted-foreground">
+                              {formatarDataHora(d)}
+                            </span>
                               <span className="font-semibold tabular-nums">
                                 {brl(d.valor)}
                               </span>
