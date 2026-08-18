@@ -203,7 +203,7 @@ export function GerenciarPessoas({ grupos }: { grupos: string[] }) {
                   id="pessoa-tel"
                   inputMode="tel"
                   value={telefone}
-                  placeholder="(62) 98187-3363"
+                  placeholder="(00) 00000-0000"
                   onChange={(e) => setTelefone(e.target.value)}
                   disabled={criar.isPending}
                 />

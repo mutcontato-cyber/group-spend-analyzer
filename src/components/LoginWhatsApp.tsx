@@ -82,7 +82,7 @@ export function LoginWhatsApp({ onEntrar }: { onEntrar: (s: Sessao) => void }) {
                 id="telefone"
                 inputMode="tel"
                 autoFocus
-                placeholder="(62) 98187-3363"
+                placeholder="(00) 00000-0000"
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
                 disabled={enviando}
