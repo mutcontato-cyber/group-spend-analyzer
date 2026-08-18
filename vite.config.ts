@@ -14,5 +14,10 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
+    output: {
+      dir: "dist",
+      serverDir: "dist/server",
+      publicDir: "dist/client",
+    },
   },
 });
