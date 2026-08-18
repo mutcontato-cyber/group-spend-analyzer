@@ -39,6 +39,7 @@ export function renderErrorPage(detail?: string): string {
         <button class="primary" onclick="location.reload()">Try again</button>
         <a class="secondary" href="/">Go home</a>
       </div>
+      ${detailBlock}
     </div>
   </body>
 </html>`;
