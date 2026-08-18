@@ -32,6 +32,7 @@ export const AUTH_ENDPOINTS = {
   enviarCodigo: `${BASE}/enviar-codigo`,
   validarCodigo: `${BASE}/validar-codigo`,
   validarSessao: `${BASE}/validar-sessao`,
+  buscarUsuario: `${BASE}/buscar-usuario`,
   listarPessoas: `${BASE}/ver-pessoas`,
   adicionarPessoa: `${BASE}/adicionar-pessoa`,
   apagarPessoa: `${BASE}/apagar-pessoa`,
@@ -189,14 +190,43 @@ export function limparCodigo() {
   window.sessionStorage.removeItem(CHAVE_CODIGO);
 }
 
+/** Busca o usuário no banco pelo telefone (webhook /buscar-usuario, com fallback em /ver-pessoas). */
+export async function buscarUsuario(telefone: string): Promise<Usuario | null> {
+  const tel = normalizarTelefone(telefone);
+  try {
+    const resp = await post(AUTH_ENDPOINTS.buscarUsuario, { telefone: tel });
+    const bruto = Array.isArray(resp) ? resp[0] : resp;
+    const o = obj(bruto);
+    if (o["ok"] !== false) {
+      const u = normalizarUsuario(bruto, tel);
+      if (u.telefone && (o["nome"] || o["Nome"] || o["usuario"] || o["pessoa"])) return u;
+    }
+  } catch {
+    // endpoint ainda não existe: tenta a lista de pessoas
+  }
+  try {
+    const pessoas = await listarPessoas();
+    return pessoas.find((p) => p.telefone === tel) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function enviarCodigo(telefone: string): Promise<void> {
   const tel = normalizarTelefone(telefone);
+
+  const usuario = await buscarUsuario(tel);
+  if (!usuario && tel !== ADMIN_TELEFONE) {
+    throw new Error("Este número não está cadastrado.");
+  }
+
   const codigo = gerarCodigo();
   const expiraEm = Date.now() + CODIGO_VALIDADE_MS;
   const resp = obj(
     await post(AUTH_ENDPOINTS.enviarCodigo, {
       telefone: tel,
       codigo,
+      nome: usuario?.nome ?? "",
       expiraEm: new Date(expiraEm).toISOString(),
       validadeSegundos: CODIGO_VALIDADE_MS / 1000,
     }),
@@ -221,17 +251,17 @@ export async function validarCodigo(
   if (cache.telefone !== tel) throw new Error("Código não corresponde a este número.");
   if (cache.codigo !== informado) throw new Error("Código incorreto.");
 
-  const resp = obj(
-    await post(AUTH_ENDPOINTS.validarCodigo, { telefone: tel, codigo: informado, lembrar }),
-  );
-  if (resp["ok"] === false) {
-    throw new Error(String(resp["mensagem"] ?? "Código inválido."));
+  // busca papel e grupos no banco
+  const doBanco = await buscarUsuario(tel);
+  if (!doBanco && tel !== ADMIN_TELEFONE) {
+    throw new Error("Usuário não encontrado no banco de dados.");
   }
+  const usuario: Usuario =
+    doBanco ?? normalizarUsuario({ telefone: tel, papel: "admin", nome: "Administrador" }, tel);
+
   limparCodigo();
-  const usuario = normalizarUsuario(resp, tel);
-  const token = typeof resp["token"] === "string" ? (resp["token"] as string) : null;
   const expiraEm = lembrar ? Date.now() + DIAS_LEMBRAR * 24 * 60 * 60 * 1000 : null;
-  return { token, usuario, expiraEm };
+  return { token: null, usuario, expiraEm };
 }
 
 export async function validarSessao(token: string): Promise<Usuario | null> {
