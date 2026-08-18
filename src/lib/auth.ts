@@ -4,8 +4,10 @@ const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
  * Endpoints que precisam existir no n8n.
  *
  * 1) POST /enviar-codigo
- *    body:  { "telefone": "5562981873363" }
- *    resp:  { "ok": true, "expiraEm": 300 }           // manda o código no WhatsApp
+ *    body:  { "telefone": "5562981873363", "codigo": "123456",
+ *             "expiraEm": "2026-08-18T03:15:00.000Z", "validadeSegundos": 300 }
+ *    O código é gerado pelo app e guardado em cache; o n8n só envia no WhatsApp.
+ *    resp:  { "ok": true }
  *           { "ok": false, "mensagem": "..." }        // telefone não cadastrado
  *
  * 2) POST /validar-codigo
