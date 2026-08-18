@@ -33,6 +33,7 @@ import {
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
+import { MetaGasto } from "@/components/MetaGasto";
 import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -544,6 +545,16 @@ function Dashboard() {
                     hint={recebedores[0]?.nome}
                   />
                 </section>
+
+                {grupoAtivo ? (
+                  <MetaGasto
+                    key={grupoAtivo}
+                    grupo={grupoAtivo}
+                    total={total}
+                    periodoLabel={periodoLabel}
+                  />
+                ) : null}
+
 
                 {section === "visao" ? (
                   <section className="grid gap-4 lg:grid-cols-3">
