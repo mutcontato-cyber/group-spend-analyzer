@@ -145,18 +145,21 @@ function Dashboard() {
     queryKey: ["despesas"],
     retry: false,
     queryFn: async () => {
-      try {
-        const res = await fetch(WEBHOOK_URL, {
-          headers: { accept: "application/json" },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (Array.isArray(json)) return json;
-          if (Array.isArray(json?.data)) return json.data;
+      for (const url of WEBHOOK_URLS) {
+        try {
+          const res = await fetch(url, {
+            headers: { accept: "application/json" },
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (Array.isArray(json)) return json;
+            if (Array.isArray(json?.data)) return json.data;
+          }
+        } catch {
+          /* tenta próximo / servidor */
         }
-      } catch {
-        /* fallback no servidor */
       }
+
       return await fetchDespesas();
     },
     select: (rows) => normalizar(rows),
