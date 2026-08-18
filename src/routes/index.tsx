@@ -477,7 +477,7 @@ function Dashboard() {
               <SidebarGroupLabel>Funções</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {SECTIONS.map((s) => (
+                  {secoesVisiveis.map((s) => (
                     <SidebarMenuItem key={s.id}>
                       <SidebarMenuButton
                         isActive={section === s.id}
