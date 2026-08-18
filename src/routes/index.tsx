@@ -16,7 +16,6 @@ import {
   Legend,
 } from "recharts";
 import {
-  ArrowUpRight,
   Check,
   ChevronsUpDown,
   Filter,
@@ -612,7 +611,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "lancamentos" ? (
-                  <section className="surface-card space-y-3 p-5">
+                  <section className="surface-card px-5 py-1">
                     {filtradas.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum lançamento neste período.
@@ -621,7 +620,7 @@ function Dashboard() {
                       filtradas.map((d) => (
                         <details
                           key={d.id}
-                          className="rounded-lg border border-border bg-secondary/50 p-4"
+                          className="border-b border-border px-1 py-3 last:border-0"
                         >
                           <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2">
                             <span className="flex flex-wrap items-center gap-2 text-sm">
@@ -674,7 +673,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "itens" ? (
-                  <section className="surface-card space-y-2 p-5">
+                  <section className="surface-card px-5 py-1">
                     {itensRank.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum item detalhado no período.
@@ -683,7 +682,7 @@ function Dashboard() {
                       itensRank.map((it) => (
                         <div
                           key={it.nome}
-                          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/50 px-4 py-3 text-sm"
+                          className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-1 py-3 text-sm last:border-0"
                         >
                           <span className="flex items-center gap-2">
                             <ShoppingBasket className="size-4 text-primary" />
@@ -703,7 +702,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "recebedores" ? (
-                  <section className="surface-card space-y-2 p-5">
+                  <section className="surface-card px-5 py-1">
                     {recebedores.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum recebedor neste período.
@@ -712,7 +711,7 @@ function Dashboard() {
                       recebedores.map((r) => (
                         <div
                           key={r.nome}
-                          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/50 px-4 py-3 text-sm"
+                          className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-1 py-3 text-sm last:border-0"
                         >
                           <span>{r.nome || "—"}</span>
                           <span className="flex items-center gap-6 text-muted-foreground">
