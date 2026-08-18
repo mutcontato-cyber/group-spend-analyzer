@@ -98,102 +98,135 @@ export function MetaGasto({
     setAberto(false);
   }
 
-  const cor =
+  const acento =
     status === "estourou"
       ? "text-destructive"
       : status === "atencao"
-        ? "text-amber-600"
-        : "text-primary";
+        ? "text-amber-400"
+        : "text-primary-foreground";
+
+  const barra =
+    status === "estourou"
+      ? "bg-destructive"
+      : status === "atencao"
+        ? "bg-amber-400"
+        : "bg-primary";
+
+  const editar = (
+    <Dialog
+      open={aberto}
+      onOpenChange={(o) => {
+        setAberto(o);
+        if (o) setRascunho(meta ? String(meta) : "");
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-current opacity-80 hover:bg-white/10 hover:opacity-100"
+        >
+          <Pencil className="size-4" />
+          {meta > 0 ? "Editar meta" : "Definir meta"}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Meta de gastos — {grupo}</DialogTitle>
+          <DialogDescription>
+            Defina o limite em reais para o período selecionado. Deixe vazio
+            para remover a meta.
+          </DialogDescription>
+        </DialogHeader>
+        <Input
+          autoFocus
+          inputMode="decimal"
+          placeholder="Ex.: 2000"
+          value={rascunho}
+          onChange={(e) => setRascunho(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && salvar()}
+        />
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setAberto(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={salvar}>Salvar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
-    <section className="surface-card p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Target className={`size-4 ${cor}`} />
-          <h2 className="text-sm font-medium">Meta de gastos</h2>
-          <span className="text-xs text-muted-foreground">{periodoLabel}</span>
+    <section className="surface-hero p-6 md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-70">
+          <Target className="size-4" />
+          <span>Meta · {periodoLabel}</span>
         </div>
-        <Dialog
-          open={aberto}
-          onOpenChange={(o) => {
-            setAberto(o);
-            if (o) setRascunho(meta ? String(meta) : "");
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Pencil className="size-4" />
-              {meta > 0 ? "Editar meta" : "Definir meta"}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Meta de gastos — {grupo}</DialogTitle>
-              <DialogDescription>
-                Defina o limite em reais para o período selecionado. Deixe vazio
-                para remover a meta.
-              </DialogDescription>
-            </DialogHeader>
-            <Input
-              autoFocus
-              inputMode="decimal"
-              placeholder="Ex.: 2000"
-              value={rascunho}
-              onChange={(e) => setRascunho(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && salvar()}
-            />
-            <DialogFooter>
-              <Button variant="ghost" onClick={() => setAberto(false)}>
-                Cancelar
-              </Button>
-              <Button onClick={salvar}>Salvar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {editar}
       </div>
 
-      {meta <= 0 ? (
-        <p className="mt-3 text-sm text-muted-foreground">
-          Nenhuma meta definida para este grupo. Defina um limite (ex.: R$
-          2.000) e acompanhe o quanto já foi gasto.
-        </p>
-      ) : (
-        <div className="mt-4 space-y-3">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <p className="text-2xl font-semibold">
-              {brl(total)}{" "}
-              <span className="text-sm font-normal text-muted-foreground">
-                de {brl(meta)}
-              </span>
+      <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4">
+        <div>
+          <p className="text-xs uppercase tracking-wider opacity-60">
+            Já gastei
+          </p>
+          <p className="mt-1 text-4xl font-semibold tabular-nums md:text-5xl">
+            {brl(total)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wider opacity-60">Meta</p>
+          <p className="mt-1 text-2xl font-medium tabular-nums opacity-80 md:text-3xl">
+            {meta > 0 ? brl(meta) : "—"}
+          </p>
+        </div>
+        {meta > 0 ? (
+          <div className="ml-auto text-right">
+            <p className={`text-3xl font-semibold tabular-nums ${acento}`}>
+              {pct.toFixed(0)}%
             </p>
-            <p className={`text-sm font-medium ${cor}`}>{pct.toFixed(0)}%</p>
+            <p className="text-xs opacity-70">
+              {restante >= 0
+                ? `restam ${brl(restante)}`
+                : `excedeu ${brl(Math.abs(restante))}`}
+            </p>
           </div>
-          <Progress value={Math.min(pct, 100)} />
-          <div className="flex items-center gap-2 text-sm">
+        ) : null}
+      </div>
+
+      {meta > 0 ? (
+        <>
+          <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-white/15">
+            <div
+              className={`h-full rounded-full transition-all ${barra}`}
+              style={{ width: `${Math.min(pct, 100)}%` }}
+            />
+          </div>
+          <div className="mt-3 flex items-center gap-2 text-sm opacity-90">
             {status === "estourou" ? (
               <>
                 <AlertTriangle className="size-4 text-destructive" />
-                <span className="text-destructive">
-                  Meta ultrapassada em {brl(Math.abs(restante))}.
-                </span>
+                <span>Meta ultrapassada em {brl(Math.abs(restante))}.</span>
               </>
             ) : status === "atencao" ? (
               <>
-                <AlertTriangle className="size-4 text-amber-600" />
-                <span className="text-amber-600">
-                  Atenção: restam apenas {brl(restante)}.
-                </span>
+                <AlertTriangle className="size-4 text-amber-400" />
+                <span>Atenção: restam apenas {brl(restante)}.</span>
               </>
             ) : (
               <>
-                <CheckCircle2 className="size-4 text-primary" />
-                <span className="text-muted-foreground">
-                  Dentro da meta — restam {brl(restante)}.
-                </span>
+                <CheckCircle2 className="size-4" />
+                <span>Dentro da meta.</span>
               </>
             )}
           </div>
-        </div>
+        </>
+      ) : (
+        <p className="mt-5 text-sm opacity-70">
+          Nenhuma meta definida para este grupo. Defina um limite (ex.: R$
+          2.000) e acompanhe o quanto já foi gasto.
+        </p>
       )}
     </section>
   );
