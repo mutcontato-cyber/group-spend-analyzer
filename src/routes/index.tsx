@@ -172,10 +172,13 @@ function Dashboard() {
 
   const despesas: Despesa[] = data ?? [];
   const grupos = useMemo(() => {
-    const set = new Set<string>();
-    for (const g of gruposCadastrados ?? []) set.add(g.nome);
-    for (const d of despesas) if (d.grupo) set.add(d.grupo);
-    return Array.from(set).sort((a, b) => a.localeCompare(b, "pt-BR"));
+    const map = new Map<string, string>();
+    // despesas primeiro: preserva o nome exatamente como está na planilha
+    for (const d of despesas) if (d.grupo) map.set(d.grupo.toLowerCase(), d.grupo);
+    for (const g of gruposCadastrados ?? []) {
+      if (!map.has(g.nome.toLowerCase())) map.set(g.nome.toLowerCase(), g.nome);
+    }
+    return Array.from(map.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
   }, [despesas, gruposCadastrados]);
 
   const hoje = new Date();
@@ -189,9 +192,14 @@ function Dashboard() {
 
   const grupoAtivo = grupo ?? grupos[0] ?? null;
   const doGrupo = useMemo(
-    () => despesas.filter((d) => d.grupo === grupoAtivo),
+    () =>
+      despesas.filter(
+        (d) =>
+          d.grupo.toLowerCase() === (grupoAtivo ?? "").toLowerCase(),
+      ),
     [despesas, grupoAtivo],
   );
+
 
   const anos = useMemo(
     () =>
