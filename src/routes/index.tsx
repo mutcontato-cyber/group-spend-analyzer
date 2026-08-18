@@ -21,10 +21,12 @@ import {
   Filter,
   LayoutDashboard,
   Loader2,
+  LogOut,
   Receipt,
   RefreshCw,
   ShoppingBasket,
   Users,
+  UserRound,
   Wallet,
   FolderCog,
 } from "lucide-react";
@@ -32,7 +34,10 @@ import {
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
+import { GerenciarPessoas } from "@/components/GerenciarPessoas";
 import { MetaGasto } from "@/components/MetaGasto";
+import { AuthProvider, useAuth } from "@/components/AuthProvider";
+import { LoginWhatsApp } from "@/components/LoginWhatsApp";
 import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,8 +92,32 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Dashboard,
+  component: PainelPage,
 });
+
+function PainelPage() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
+  );
+}
+
+function Gate() {
+  const { usuario, carregando, entrar } = useAuth();
+
+  if (carregando) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!usuario) return <LoginWhatsApp onEntrar={entrar} />;
+
+  return <Dashboard />;
+}
 
 const TODOS = "todos";
 const WEBHOOK_URLS = [
@@ -101,14 +130,21 @@ type SectionId =
   | "lancamentos"
   | "itens"
   | "recebedores"
-  | "grupos";
+  | "grupos"
+  | "pessoas";
 
-const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
+const SECTIONS: {
+  id: SectionId;
+  label: string;
+  icon: React.ElementType;
+  adminOnly?: boolean;
+}[] = [
   { id: "visao", label: "Visão geral", icon: LayoutDashboard },
   { id: "lancamentos", label: "Lançamentos", icon: Receipt },
   { id: "itens", label: "Itens mais comprados", icon: ShoppingBasket },
   { id: "recebedores", label: "Recebedores", icon: Users },
-  { id: "grupos", label: "Gerenciar grupos", icon: FolderCog },
+  { id: "grupos", label: "Gerenciar grupos", icon: FolderCog, adminOnly: true },
+  { id: "pessoas", label: "Gerenciar pessoas", icon: UserRound, adminOnly: true },
 ];
 
 function Kpi({
@@ -132,6 +168,9 @@ function Kpi({
 }
 
 function Dashboard() {
+  const { usuario, sair } = useAuth();
+  const isAdmin = usuario?.papel === "admin";
+  const secoesVisiveis = SECTIONS.filter((s) => !s.adminOnly || isAdmin);
   const fetchDespesas = useServerFn(getDespesas);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["despesas"],
@@ -171,8 +210,13 @@ function Dashboard() {
     for (const g of gruposCadastrados ?? []) {
       if (!map.has(g.nome.toLowerCase())) map.set(g.nome.toLowerCase(), g.nome);
     }
-    return Array.from(map.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [despesas, gruposCadastrados]);
+    let lista = Array.from(map.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
+    if (!isAdmin) {
+      const permitidos = new Set((usuario?.grupos ?? []).map((g) => g.toLowerCase()));
+      lista = lista.filter((g) => permitidos.has(g.toLowerCase()));
+    }
+    return lista;
+  }, [despesas, gruposCadastrados, isAdmin, usuario]);
 
   const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
@@ -433,7 +477,7 @@ function Dashboard() {
               <SidebarGroupLabel>Funções</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {SECTIONS.map((s) => (
+                  {secoesVisiveis.map((s) => (
                     <SidebarMenuItem key={s.id}>
                       <SidebarMenuButton
                         isActive={section === s.id}
@@ -450,7 +494,13 @@ function Dashboard() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="gap-2 p-3">
+            <div className="min-w-0 px-1 group-data-[collapsible=icon]:hidden">
+              <p className="truncate text-sm font-medium">{usuario?.nome}</p>
+              <p className="truncate text-xs opacity-70">
+                {isAdmin ? "Administrador" : "Acesso ao grupo"}
+              </p>
+            </div>
             <Button
               variant="secondary"
               className="w-full"
@@ -465,6 +515,10 @@ function Dashboard() {
               <span className="group-data-[collapsible=icon]:hidden">
                 Atualizar dados
               </span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" onClick={sair}>
+              <LogOut className="size-4" />
+              <span className="group-data-[collapsible=icon]:hidden">Sair</span>
             </Button>
           </SidebarFooter>
         </Sidebar>
@@ -484,13 +538,15 @@ function Dashboard() {
           </header>
 
           <main className="space-y-5 p-4 md:p-6">
-            {section === "grupos" ? (
+            {section === "grupos" && isAdmin ? (
               <GerenciarGrupos
                 onGruposAlterados={() => {
                   refetch();
                   refetchGrupos();
                 }}
               />
+            ) : section === "pessoas" && isAdmin ? (
+              <GerenciarPessoas grupos={grupos} />
             ) : isLoading ? (
               <div className="surface-card flex items-center gap-3 p-10 text-muted-foreground">
                 <Loader2 className="size-5 animate-spin" /> Carregando
