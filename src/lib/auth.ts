@@ -1,4 +1,11 @@
-const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
+const HOST = "https://noiton-n8n.lm218l.easypanel.host";
+const BASE = `${HOST}/webhook-test`;
+const BASE_PROD = `${HOST}/webhook`;
+
+/** Mesma rota na base de produção (fallback quando o webhook-test não está ativo). */
+function alternativa(url: string): string {
+  return url.startsWith(BASE) ? `${BASE_PROD}${url.slice(BASE.length)}` : url;
+}
 
 /**
  * Endpoints que precisam existir no n8n.
@@ -81,29 +88,55 @@ export function telefoneValido(v: string): boolean {
   return d.length >= 12 && d.length <= 13;
 }
 
-async function post(url: string, body: unknown): Promise<unknown> {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify(body),
-  });
-  const text = await res.text();
-  let json: unknown = null;
-  if (text.trim()) {
-    try {
-      json = JSON.parse(text);
-    } catch {
-      json = text;
-    }
+function parse(text: string): unknown {
+  if (!text.trim()) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
   }
-  if (!res.ok) {
+}
+
+async function post(url: string, body: unknown): Promise<unknown> {
+  let ultimoErro: Error | null = null;
+  for (const alvo of [url, alternativa(url)]) {
+    let res: Response;
+    try {
+      res = await fetch(alvo, {
+        method: "POST",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch {
+      ultimoErro = new Error("Não foi possível se conectar ao servidor.");
+      continue;
+    }
+    const json = parse(await res.text());
+    if (res.ok) return json;
     const msg =
       (json && typeof json === "object" && typeof (json as Record<string, unknown>)["mensagem"] === "string"
         ? ((json as Record<string, unknown>)["mensagem"] as string)
         : null) ?? (typeof json === "string" ? json.slice(0, 200) : null);
-    throw new Error(msg || `Erro ${res.status} ao comunicar com o servidor.`);
+    ultimoErro = new Error(msg || `Erro ${res.status} ao comunicar com o servidor.`);
   }
-  return json;
+  throw ultimoErro ?? new Error("Erro ao comunicar com o servidor.");
+}
+
+async function get(url: string): Promise<unknown> {
+  let ultimoErro: Error | null = null;
+  for (const alvo of [url, alternativa(url)]) {
+    let res: Response;
+    try {
+      res = await fetch(alvo, { headers: { accept: "application/json" } });
+    } catch {
+      ultimoErro = new Error("Não foi possível se conectar ao servidor.");
+      continue;
+    }
+    const text = await res.text();
+    if (res.ok) return parse(text);
+    ultimoErro = new Error(text.slice(0, 200) || `Erro ${res.status} ao buscar dados.`);
+  }
+  throw ultimoErro ?? new Error("Erro ao buscar dados.");
 }
 
 function obj(v: unknown): Record<string, unknown> {
@@ -278,17 +311,7 @@ export async function validarSessao(token: string): Promise<Usuario | null> {
 export type Pessoa = Usuario;
 
 export async function listarPessoas(): Promise<Pessoa[]> {
-  const res = await fetch(AUTH_ENDPOINTS.listarPessoas, { headers: { accept: "application/json" } });
-  const text = await res.text();
-  if (!res.ok) throw new Error(text.slice(0, 200) || `Erro ${res.status} ao listar pessoas.`);
-  let json: unknown = [];
-  if (text.trim()) {
-    try {
-      json = JSON.parse(text);
-    } catch {
-      json = [];
-    }
-  }
+  const json = await get(AUTH_ENDPOINTS.listarPessoas);
   let rows: unknown[] = [];
   if (Array.isArray(json)) rows = json;
   else {
