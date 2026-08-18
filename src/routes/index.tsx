@@ -210,8 +210,13 @@ function Dashboard() {
     for (const g of gruposCadastrados ?? []) {
       if (!map.has(g.nome.toLowerCase())) map.set(g.nome.toLowerCase(), g.nome);
     }
-    return Array.from(map.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [despesas, gruposCadastrados]);
+    let lista = Array.from(map.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
+    if (!isAdmin) {
+      const permitidos = new Set((usuario?.grupos ?? []).map((g) => g.toLowerCase()));
+      lista = lista.filter((g) => permitidos.has(g.toLowerCase()));
+    }
+    return lista;
+  }, [despesas, gruposCadastrados, isAdmin, usuario]);
 
   const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
