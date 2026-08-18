@@ -84,7 +84,10 @@ export function LoginWhatsApp({ onEntrar }: { onEntrar: (s: Sessao) => void }) {
                 autoFocus
                 placeholder="(55) 00 00000-0000"
                 value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D+/g, "");
+                  setTelefone(digits.startsWith("55") ? digits : `55${digits.replace(/^55/, "")}`);
+                }}
                 disabled={enviando}
               />
               <p className="text-xs text-muted-foreground">
