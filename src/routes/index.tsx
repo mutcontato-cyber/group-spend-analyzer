@@ -92,8 +92,32 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Dashboard,
+  component: PainelPage,
 });
+
+function PainelPage() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
+  );
+}
+
+function Gate() {
+  const { usuario, carregando, entrar } = useAuth();
+
+  if (carregando) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!usuario) return <LoginWhatsApp onEntrar={entrar} />;
+
+  return <Dashboard />;
+}
 
 const TODOS = "todos";
 const WEBHOOK_URLS = [
@@ -106,14 +130,21 @@ type SectionId =
   | "lancamentos"
   | "itens"
   | "recebedores"
-  | "grupos";
+  | "grupos"
+  | "pessoas";
 
-const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
+const SECTIONS: {
+  id: SectionId;
+  label: string;
+  icon: React.ElementType;
+  adminOnly?: boolean;
+}[] = [
   { id: "visao", label: "Visão geral", icon: LayoutDashboard },
   { id: "lancamentos", label: "Lançamentos", icon: Receipt },
   { id: "itens", label: "Itens mais comprados", icon: ShoppingBasket },
   { id: "recebedores", label: "Recebedores", icon: Users },
-  { id: "grupos", label: "Gerenciar grupos", icon: FolderCog },
+  { id: "grupos", label: "Gerenciar grupos", icon: FolderCog, adminOnly: true },
+  { id: "pessoas", label: "Gerenciar pessoas", icon: UserRound, adminOnly: true },
 ];
 
 function Kpi({
