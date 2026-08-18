@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 import { getDespesas } from "@/lib/despesas.functions";
-import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, type Despesa } from "@/lib/despesas";
+import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
 import { MetaGasto } from "@/components/MetaGasto";
 import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
