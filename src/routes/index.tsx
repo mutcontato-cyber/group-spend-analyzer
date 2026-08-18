@@ -494,7 +494,13 @@ function Dashboard() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="gap-2 p-3">
+            <div className="min-w-0 px-1 group-data-[collapsible=icon]:hidden">
+              <p className="truncate text-sm font-medium">{usuario?.nome}</p>
+              <p className="truncate text-xs opacity-70">
+                {isAdmin ? "Administrador" : "Acesso ao grupo"}
+              </p>
+            </div>
             <Button
               variant="secondary"
               className="w-full"
@@ -509,6 +515,10 @@ function Dashboard() {
               <span className="group-data-[collapsible=icon]:hidden">
                 Atualizar dados
               </span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" onClick={sair}>
+              <LogOut className="size-4" />
+              <span className="group-data-[collapsible=icon]:hidden">Sair</span>
             </Button>
           </SidebarFooter>
         </Sidebar>
