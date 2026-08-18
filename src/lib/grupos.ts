@@ -72,13 +72,8 @@ async function parseResposta(res: Response) {
   }
 }
 
-/** Tenta o webhook-test e, se ele não estiver ativo (404), usa o webhook normal. */
 async function fetchComFallback(url: string, init?: RequestInit) {
-  const res = await fetch(url, init);
-  if (res.status === 404 && url.includes("/webhook-test/")) {
-    return fetch(url.replace("/webhook-test/", "/webhook/"), init);
-  }
-  return res;
+  return fetch(url, init);
 }
 
 export async function listarGrupos(): Promise<Grupo[]> {
