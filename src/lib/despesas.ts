@@ -75,7 +75,8 @@ function parseItens(raw: string): Item[] {
             total: total == null || total === "" ? null : num(total),
           };
         });
-      if (itens.length) return itens;
+      // JSON válido (mesmo vazio) não deve cair no parser de texto
+      return itens;
     } catch {
       /* segue para o parser de texto */
     }
@@ -119,7 +120,7 @@ function parseItens(raw: string): Item[] {
 }
 
 export function normalizar(rows: unknown[]): Despesa[] {
-  return (rows as RawDespesa[])
+  const base = (rows as RawDespesa[])
     .filter((r) => r && typeof r === "object")
     .map((r, i) => {
       let dataStr = (r.data ?? "").trim();
@@ -154,6 +155,72 @@ export function normalizar(rows: unknown[]): Despesa[] {
         criadoEm: r.createdAt ?? null,
       };
     });
+  return mesclarFragmentos(base);
+}
+
+const tempoDe = (d: Despesa): number => {
+  if (d.criadoEm) {
+    const t = new Date(d.criadoEm).getTime();
+    if (!Number.isNaN(t)) return t;
+  }
+  if (d.data) {
+    const t = new Date(`${d.data}T${d.hora || "00:00:00"}`).getTime();
+    if (!Number.isNaN(t)) return t;
+  }
+  return 0;
+};
+
+/**
+ * O n8n às vezes grava o mesmo gasto em duas linhas:
+ * uma só com o valor (sem itens) e outra só com o produto (valor 0).
+ * Aqui juntamos as duas em um único lançamento.
+ */
+export function mesclarFragmentos(lista: Despesa[], janelaMs = 10_000): Despesa[] {
+  const ordenada = [...lista].sort((a, b) => tempoDe(a) - tempoDe(b));
+  const usados = new Set<number>();
+  const resultado: Despesa[] = [];
+
+  ordenada.forEach((atual, i) => {
+    if (usados.has(i)) return;
+    const soValor = atual.valor > 0 && atual.itens.length === 0;
+    const soItem = atual.valor === 0 && atual.itens.length > 0;
+    if (soValor || soItem) {
+      for (let j = i + 1; j < ordenada.length; j++) {
+        if (usados.has(j)) continue;
+        const outro = ordenada[j]!;
+        const dt = Math.abs(tempoDe(outro) - tempoDe(atual));
+        if (dt > janelaMs) break;
+        if (outro.grupo.toLowerCase() !== atual.grupo.toLowerCase()) continue;
+        const par =
+          (soValor && outro.valor === 0 && outro.itens.length > 0) ||
+          (soItem && outro.valor > 0 && outro.itens.length === 0);
+        if (!par) continue;
+        const comValor = soValor ? atual : outro;
+        const comItens = soValor ? outro : atual;
+        usados.add(i);
+        usados.add(j);
+        resultado.push({
+          ...comValor,
+          itens: comItens.itens.map((it) =>
+            it.total == null && it.unitario == null && comItens.itens.length === 1
+              ? { ...it, total: comValor.valor }
+              : it,
+          ),
+          itensRaw: comItens.itensRaw,
+          recebedor: recebedorEhConhecido(comValor.recebedor)
+            ? comValor.recebedor
+            : comItens.recebedor,
+          comprovante: comValor.comprovante || comItens.comprovante,
+        });
+        break;
+      }
+      if (usados.has(i)) return;
+    }
+    usados.add(i);
+    resultado.push(atual);
+  });
+
+  return resultado.sort((a, b) => tempoDe(b) - tempoDe(a));
 }
 
 
