@@ -538,13 +538,15 @@ function Dashboard() {
           </header>
 
           <main className="space-y-5 p-4 md:p-6">
-            {section === "grupos" ? (
+            {section === "grupos" && isAdmin ? (
               <GerenciarGrupos
                 onGruposAlterados={() => {
                   refetch();
                   refetchGrupos();
                 }}
               />
+            ) : section === "pessoas" && isAdmin ? (
+              <GerenciarPessoas grupos={grupos} />
             ) : isLoading ? (
               <div className="surface-card flex items-center gap-3 p-10 text-muted-foreground">
                 <Loader2 className="size-5 animate-spin" /> Carregando
