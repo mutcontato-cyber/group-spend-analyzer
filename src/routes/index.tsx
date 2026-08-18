@@ -637,7 +637,11 @@ function Dashboard() {
                         >
                           <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2">
                             <span className="flex flex-wrap items-center gap-2 text-sm">
-                              <span className="font-medium">{d.recebedor}</span>
+                              <span className="font-medium">
+                                {recebedorEhConhecido(d.recebedor)
+                                  ? d.recebedor
+                                  : nomesProdutos(d.itens)}
+                              </span>
                               <Badge variant="outline">{d.metodo}</Badge>
                               {d.comprovante ? (
                                 <Badge>Comprovante</Badge>
