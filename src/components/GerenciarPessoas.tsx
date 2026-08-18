@@ -203,8 +203,11 @@ export function GerenciarPessoas({ grupos }: { grupos: string[] }) {
                   id="pessoa-tel"
                   inputMode="tel"
                   value={telefone}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D+/g, "");
+                    setTelefone(digits.startsWith("55") ? digits : `55${digits.replace(/^55/, "")}`);
+                  }}
                   placeholder="(55) 00 00000-0000"
-                  onChange={(e) => setTelefone(e.target.value)}
                   disabled={criar.isPending}
                 />
               </div>
