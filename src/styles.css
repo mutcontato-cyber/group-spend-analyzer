@@ -87,8 +87,8 @@
   --chart-3: oklch(0.35 0.08 262);
   --chart-4: oklch(0.78 0.09 245);
   --chart-5: oklch(0.22 0.02 260);
-  --gradient-hero: linear-gradient(135deg, oklch(0.24 0.04 262), oklch(0.42 0.16 258));
-  --shadow-card: 0 1px 2px oklch(0.2 0.02 260 / 0.06), 0 8px 24px -16px oklch(0.2 0.02 260 / 0.25);
+  --gradient-hero: linear-gradient(135deg, oklch(0.18 0.02 262), oklch(0.32 0.09 260));
+  --shadow-card: none;
   --sidebar: oklch(0.16 0.02 262);
   --sidebar-foreground: oklch(0.96 0.004 250);
   --sidebar-primary: oklch(0.55 0.19 258);
@@ -149,13 +149,16 @@
 @utility surface-card {
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
 }
 
 @utility surface-hero {
   background-image: var(--gradient-hero);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-xl);
+  color: oklch(0.98 0.003 250);
+}
+
+@utility surface-quiet {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border);
 }

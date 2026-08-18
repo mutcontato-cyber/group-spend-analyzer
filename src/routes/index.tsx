@@ -16,7 +16,6 @@ import {
   Legend,
 } from "recharts";
 import {
-  ArrowUpRight,
   Check,
   ChevronsUpDown,
   Filter,
@@ -115,25 +114,18 @@ const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
 function Kpi({
   label,
   value,
-  icon: Icon,
   hint,
 }: {
   label: string;
   value: string;
-  icon: React.ElementType;
   hint?: string | undefined;
 }) {
   return (
-    <div className="surface-card p-5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {label}
-        </span>
-        <Icon className="size-4 text-primary" />
-      </div>
-      <p className="mt-3 text-2xl font-semibold tabular-nums">{value}</p>
+    <div className="px-4 py-3">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <p className="mt-1 text-lg font-medium tabular-nums">{value}</p>
       {hint ? (
-        <p className="mt-1 truncate text-xs text-muted-foreground">{hint}</p>
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">{hint}</p>
       ) : null}
     </div>
   );
@@ -518,34 +510,6 @@ function Dashboard() {
               </div>
             ) : (
               <>
-                {filtros}
-
-                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <Kpi
-                    label="Gasto no período"
-                    value={brl(total)}
-                    icon={Wallet}
-                    hint={periodoLabel}
-                  />
-                  <Kpi
-                    label="Lançamentos"
-                    value={String(filtradas.length)}
-                    icon={Receipt}
-                    hint={`${comComprovante} com comprovante`}
-                  />
-                  <Kpi
-                    label="Ticket médio"
-                    value={brl(ticket)}
-                    icon={ArrowUpRight}
-                  />
-                  <Kpi
-                    label="Recebedores"
-                    value={String(recebedores.length)}
-                    icon={Users}
-                    hint={recebedores[0]?.nome}
-                  />
-                </section>
-
                 {grupoAtivo ? (
                   <MetaGasto
                     key={grupoAtivo}
@@ -554,6 +518,29 @@ function Dashboard() {
                     periodoLabel={periodoLabel}
                   />
                 ) : null}
+
+                {filtros}
+
+                <section className="surface-card grid divide-y divide-border sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4 sm:[&>*+*]:border-l sm:[&>*+*]:border-border">
+                  <Kpi
+                    label="Gasto no período"
+                    value={brl(total)}
+                    hint={periodoLabel}
+                  />
+                  <Kpi
+                    label="Lançamentos"
+                    value={String(filtradas.length)}
+                    hint={`${comComprovante} com comprovante`}
+                  />
+                  <Kpi label="Ticket médio" value={brl(ticket)} />
+                  <Kpi
+                    label="Recebedores"
+                    value={String(recebedores.length)}
+                    hint={recebedores[0]?.nome}
+                  />
+                </section>
+
+
 
 
                 {section === "visao" ? (
@@ -624,7 +611,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "lancamentos" ? (
-                  <section className="surface-card space-y-3 p-5">
+                  <section className="surface-card px-5 py-1">
                     {filtradas.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum lançamento neste período.
@@ -633,7 +620,7 @@ function Dashboard() {
                       filtradas.map((d) => (
                         <details
                           key={d.id}
-                          className="rounded-lg border border-border bg-secondary/50 p-4"
+                          className="border-b border-border px-1 py-3 last:border-0"
                         >
                           <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2">
                             <span className="flex flex-wrap items-center gap-2 text-sm">
@@ -686,7 +673,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "itens" ? (
-                  <section className="surface-card space-y-2 p-5">
+                  <section className="surface-card px-5 py-1">
                     {itensRank.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum item detalhado no período.
@@ -695,7 +682,7 @@ function Dashboard() {
                       itensRank.map((it) => (
                         <div
                           key={it.nome}
-                          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/50 px-4 py-3 text-sm"
+                          className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-1 py-3 text-sm last:border-0"
                         >
                           <span className="flex items-center gap-2">
                             <ShoppingBasket className="size-4 text-primary" />
@@ -715,7 +702,7 @@ function Dashboard() {
                 ) : null}
 
                 {section === "recebedores" ? (
-                  <section className="surface-card space-y-2 p-5">
+                  <section className="surface-card px-5 py-1">
                     {recebedores.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         Nenhum recebedor neste período.
@@ -724,7 +711,7 @@ function Dashboard() {
                       recebedores.map((r) => (
                         <div
                           key={r.nome}
-                          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-secondary/50 px-4 py-3 text-sm"
+                          className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-1 py-3 text-sm last:border-0"
                         >
                           <span>{r.nome || "—"}</span>
                           <span className="flex items-center gap-6 text-muted-foreground">
