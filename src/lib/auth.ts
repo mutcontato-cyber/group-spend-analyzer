@@ -1,4 +1,11 @@
-const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
+const HOST = "https://noiton-n8n.lm218l.easypanel.host";
+const BASE = `${HOST}/webhook-test`;
+const BASE_PROD = `${HOST}/webhook`;
+
+/** Mesma rota na base de produção (fallback quando o webhook-test não está ativo). */
+function alternativa(url: string): string {
+  return url.startsWith(BASE) ? `${BASE_PROD}${url.slice(BASE.length)}` : url;
+}
 
 /**
  * Endpoints que precisam existir no n8n.
