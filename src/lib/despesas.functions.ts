@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import type { RawDespesa } from "./despesas";
 
 const HOST = "https://noiton-n8n.lm218l.easypanel.host";
-const ENDPOINTS = [`${HOST}/webhook-test/puxar-planilha`];
+const ENDPOINTS = [
+  `${HOST}/webhook-test/puxar-planilha`,
+  `${HOST}/webhook/puxar-planilha`,
+];
 
 export const getDespesas = createServerFn({ method: "GET" }).handler(
   async (): Promise<RawDespesa[]> => {
