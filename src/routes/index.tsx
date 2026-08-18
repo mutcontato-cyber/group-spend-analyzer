@@ -545,6 +545,16 @@ function Dashboard() {
                   />
                 </section>
 
+                {grupoAtivo ? (
+                  <MetaGasto
+                    key={grupoAtivo}
+                    grupo={grupoAtivo}
+                    total={total}
+                    periodoLabel={periodoLabel}
+                  />
+                ) : null}
+
+
                 {section === "visao" ? (
                   <section className="grid gap-4 lg:grid-cols-3">
                     <div className="surface-card p-5 lg:col-span-2">
