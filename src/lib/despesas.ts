@@ -264,3 +264,28 @@ export function nomesProdutos(
 
 export const brl = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+export function formatarDataHora(d: Despesa): string {
+  let dataStr = d.data;
+  let horaStr = d.hora;
+
+  if (!dataStr && d.criadoEm) {
+    const dt = new Date(d.criadoEm);
+    if (!Number.isNaN(dt.getTime())) {
+      dataStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+      horaStr = `${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}:${String(dt.getSeconds()).padStart(2, "0")}`;
+    }
+  }
+
+  if (!dataStr) return "sem data";
+
+  const partesData = dataStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const dataFmt = partesData
+    ? `${partesData[3]}/${partesData[2]}/${partesData[1]}`
+    : dataStr;
+
+  const partesHora = horaStr?.match(/^(\d{2}):(\d{2})/);
+  const horaFmt = partesHora ? `${partesHora[1]}:${partesHora[2]}` : "";
+
+  return horaFmt ? `${dataFmt} ${horaFmt}` : dataFmt;
+}

@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 import { getDespesas } from "@/lib/despesas.functions";
-import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, type Despesa } from "@/lib/despesas";
+import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
 import { MetaGasto } from "@/components/MetaGasto";
 import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
@@ -652,9 +652,9 @@ function Dashboard() {
                               )}
                             </span>
                             <span className="flex items-center gap-4 text-sm">
-                              <span className="text-muted-foreground">
-                                {d.data ?? "sem data"} {d.hora}
-                              </span>
+                            <span className="text-muted-foreground">
+                              {formatarDataHora(d)}
+                            </span>
                               <span className="font-semibold tabular-nums">
                                 {brl(d.valor)}
                               </span>
