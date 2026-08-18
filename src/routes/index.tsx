@@ -168,6 +168,9 @@ function Kpi({
 }
 
 function Dashboard() {
+  const { usuario, sair } = useAuth();
+  const isAdmin = usuario?.papel === "admin";
+  const secoesVisiveis = SECTIONS.filter((s) => !s.adminOnly || isAdmin);
   const fetchDespesas = useServerFn(getDespesas);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["despesas"],
