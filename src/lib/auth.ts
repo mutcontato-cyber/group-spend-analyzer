@@ -311,17 +311,7 @@ export async function validarSessao(token: string): Promise<Usuario | null> {
 export type Pessoa = Usuario;
 
 export async function listarPessoas(): Promise<Pessoa[]> {
-  const res = await fetch(AUTH_ENDPOINTS.listarPessoas, { headers: { accept: "application/json" } });
-  const text = await res.text();
-  if (!res.ok) throw new Error(text.slice(0, 200) || `Erro ${res.status} ao listar pessoas.`);
-  let json: unknown = [];
-  if (text.trim()) {
-    try {
-      json = JSON.parse(text);
-    } catch {
-      json = [];
-    }
-  }
+  const json = await get(AUTH_ENDPOINTS.listarPessoas);
   let rows: unknown[] = [];
   if (Array.isArray(json)) rows = json;
   else {
