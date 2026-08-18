@@ -3,7 +3,6 @@ import type { RawDespesa } from "./despesas";
 
 const HOST = "https://noiton-n8n.lm218l.easypanel.host";
 const ENDPOINTS = [
-  `${HOST}/webhook-test/puxar-planilha`,
   `${HOST}/webhook/puxar-planilha`,
 ];
 
