@@ -4,8 +4,10 @@ const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
  * Endpoints que precisam existir no n8n.
  *
  * 1) POST /enviar-codigo
- *    body:  { "telefone": "5562981873363" }
- *    resp:  { "ok": true, "expiraEm": 300 }           // manda o código no WhatsApp
+ *    body:  { "telefone": "5562981873363", "codigo": "123456",
+ *             "expiraEm": "2026-08-18T03:15:00.000Z", "validadeSegundos": 300 }
+ *    O código é gerado pelo app e guardado em cache; o n8n só envia no WhatsApp.
+ *    resp:  { "ok": true }
  *           { "ok": false, "mensagem": "..." }        // telefone não cadastrado
  *
  * 2) POST /validar-codigo
@@ -147,11 +149,62 @@ export function normalizarUsuario(raw: unknown, telefoneFallback = ""): Usuario 
 
 /* --------------------------------- API ---------------------------------- */
 
+/* -------------------- código gerado e guardado no cache ------------------- */
+
+const CHAVE_CODIGO = "painel.codigo";
+/** Validade do código gerado (5 minutos). */
+export const CODIGO_VALIDADE_MS = 5 * 60 * 1000;
+
+type CodigoCache = { telefone: string; codigo: string; expiraEm: number };
+
+function gerarCodigo(): string {
+  const n = Math.floor(Math.random() * 1_000_000);
+  return String(n).padStart(6, "0");
+}
+
+function guardarCodigo(c: CodigoCache) {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(CHAVE_CODIGO, JSON.stringify(c));
+}
+
+function lerCodigo(): CodigoCache | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.sessionStorage.getItem(CHAVE_CODIGO);
+  if (!raw) return null;
+  try {
+    const c = JSON.parse(raw) as CodigoCache;
+    if (!c?.codigo || !c?.telefone || c.expiraEm < Date.now()) {
+      window.sessionStorage.removeItem(CHAVE_CODIGO);
+      return null;
+    }
+    return c;
+  } catch {
+    window.sessionStorage.removeItem(CHAVE_CODIGO);
+    return null;
+  }
+}
+
+export function limparCodigo() {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(CHAVE_CODIGO);
+}
+
 export async function enviarCodigo(telefone: string): Promise<void> {
-  const resp = obj(await post(AUTH_ENDPOINTS.enviarCodigo, { telefone: normalizarTelefone(telefone) }));
+  const tel = normalizarTelefone(telefone);
+  const codigo = gerarCodigo();
+  const expiraEm = Date.now() + CODIGO_VALIDADE_MS;
+  const resp = obj(
+    await post(AUTH_ENDPOINTS.enviarCodigo, {
+      telefone: tel,
+      codigo,
+      expiraEm: new Date(expiraEm).toISOString(),
+      validadeSegundos: CODIGO_VALIDADE_MS / 1000,
+    }),
+  );
   if (resp["ok"] === false) {
     throw new Error(String(resp["mensagem"] ?? "Não foi possível enviar o código."));
   }
+  guardarCodigo({ telefone: tel, codigo, expiraEm });
 }
 
 export async function validarCodigo(
@@ -160,12 +213,21 @@ export async function validarCodigo(
   lembrar: boolean,
 ): Promise<Sessao> {
   const tel = normalizarTelefone(telefone);
+  const informado = codigo.trim();
+
+  // confere com o código guardado no cache
+  const cache = lerCodigo();
+  if (!cache) throw new Error("Código expirado. Peça um novo código.");
+  if (cache.telefone !== tel) throw new Error("Código não corresponde a este número.");
+  if (cache.codigo !== informado) throw new Error("Código incorreto.");
+
   const resp = obj(
-    await post(AUTH_ENDPOINTS.validarCodigo, { telefone: tel, codigo: codigo.trim(), lembrar }),
+    await post(AUTH_ENDPOINTS.validarCodigo, { telefone: tel, codigo: informado, lembrar }),
   );
   if (resp["ok"] === false) {
     throw new Error(String(resp["mensagem"] ?? "Código inválido."));
   }
+  limparCodigo();
   const usuario = normalizarUsuario(resp, tel);
   const token = typeof resp["token"] === "string" ? (resp["token"] as string) : null;
   const expiraEm = lembrar ? Date.now() + DIAS_LEMBRAR * 24 * 60 * 60 * 1000 : null;
