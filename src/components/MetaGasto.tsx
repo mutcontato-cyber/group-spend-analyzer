@@ -1,0 +1,200 @@
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, CheckCircle2, Target, Pencil } from "lucide-react";
+import { toast } from "sonner";
+
+import { brl } from "@/lib/despesas";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const STORAGE_KEY = "metas-gastos-v1";
+
+type Metas = Record<string, number>;
+
+function lerMetas(): Metas {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as Metas) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function salvarMetas(metas: Metas) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(metas));
+  } catch {
+    /* ignora */
+  }
+}
+
+export function MetaGasto({
+  grupo,
+  total,
+  periodoLabel,
+}: {
+  grupo: string;
+  total: number;
+  periodoLabel: string;
+}) {
+  const chave = grupo.toLowerCase();
+  const [metas, setMetas] = useState<Metas>({});
+  const [aberto, setAberto] = useState(false);
+  const [rascunho, setRascunho] = useState("");
+
+  useEffect(() => {
+    setMetas(lerMetas());
+  }, []);
+
+  const meta = metas[chave] ?? 0;
+  const pct = meta > 0 ? (total / meta) * 100 : 0;
+  const restante = meta - total;
+
+  const status = useMemo(() => {
+    if (meta <= 0) return "sem-meta" as const;
+    if (pct >= 100) return "estourou" as const;
+    if (pct >= 80) return "atencao" as const;
+    return "ok" as const;
+  }, [meta, pct]);
+
+  useEffect(() => {
+    if (status === "estourou") {
+      toast.error(`Meta de ${grupo} ultrapassada`, {
+        id: `meta-${chave}-estourou`,
+        description: `${brl(total)} gastos de ${brl(meta)} (${pct.toFixed(0)}%).`,
+      });
+    } else if (status === "atencao") {
+      toast.warning(`Você já usou ${pct.toFixed(0)}% da meta de ${grupo}`, {
+        id: `meta-${chave}-atencao`,
+        description: `Restam ${brl(Math.max(restante, 0))} para o limite.`,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, chave]);
+
+  function salvar() {
+    const valor = Number(rascunho.replace(/\./g, "").replace(",", "."));
+    const proximo = { ...metas };
+    if (!rascunho.trim() || !Number.isFinite(valor) || valor <= 0) {
+      delete proximo[chave];
+      toast.success("Meta removida.");
+    } else {
+      proximo[chave] = valor;
+      toast.success(`Meta de ${brl(valor)} definida para ${grupo}.`);
+    }
+    setMetas(proximo);
+    salvarMetas(proximo);
+    setAberto(false);
+  }
+
+  const cor =
+    status === "estourou"
+      ? "text-destructive"
+      : status === "atencao"
+        ? "text-amber-600"
+        : "text-primary";
+
+  return (
+    <section className="surface-card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Target className={`size-4 ${cor}`} />
+          <h2 className="text-sm font-medium">Meta de gastos</h2>
+          <span className="text-xs text-muted-foreground">{periodoLabel}</span>
+        </div>
+        <Dialog
+          open={aberto}
+          onOpenChange={(o) => {
+            setAberto(o);
+            if (o) setRascunho(meta ? String(meta) : "");
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Pencil className="size-4" />
+              {meta > 0 ? "Editar meta" : "Definir meta"}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Meta de gastos — {grupo}</DialogTitle>
+              <DialogDescription>
+                Defina o limite em reais para o período selecionado. Deixe vazio
+                para remover a meta.
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              autoFocus
+              inputMode="decimal"
+              placeholder="Ex.: 2000"
+              value={rascunho}
+              onChange={(e) => setRascunho(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && salvar()}
+            />
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setAberto(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={salvar}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {meta <= 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Nenhuma meta definida para este grupo. Defina um limite (ex.: R$
+          2.000) e acompanhe o quanto já foi gasto.
+        </p>
+      ) : (
+        <div className="mt-4 space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <p className="text-2xl font-semibold">
+              {brl(total)}{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                de {brl(meta)}
+              </span>
+            </p>
+            <p className={`text-sm font-medium ${cor}`}>{pct.toFixed(0)}%</p>
+          </div>
+          <Progress value={Math.min(pct, 100)} />
+          <div className="flex items-center gap-2 text-sm">
+            {status === "estourou" ? (
+              <>
+                <AlertTriangle className="size-4 text-destructive" />
+                <span className="text-destructive">
+                  Meta ultrapassada em {brl(Math.abs(restante))}.
+                </span>
+              </>
+            ) : status === "atencao" ? (
+              <>
+                <AlertTriangle className="size-4 text-amber-600" />
+                <span className="text-amber-600">
+                  Atenção: restam apenas {brl(restante)}.
+                </span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="size-4 text-primary" />
+                <span className="text-muted-foreground">
+                  Dentro da meta — restam {brl(restante)}.
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
