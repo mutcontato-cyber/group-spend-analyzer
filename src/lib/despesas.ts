@@ -75,7 +75,8 @@ function parseItens(raw: string): Item[] {
             total: total == null || total === "" ? null : num(total),
           };
         });
-      if (itens.length) return itens;
+      // JSON válido (mesmo vazio) não deve cair no parser de texto
+      return itens;
     } catch {
       /* segue para o parser de texto */
     }
