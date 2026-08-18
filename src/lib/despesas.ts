@@ -47,10 +47,45 @@ const num = (v: unknown): number => {
 
 function parseItens(raw: string): Item[] {
   if (!raw?.trim()) return [];
+
+  // Formato JSON: [{"produto":"...","quantidade":1,"unidade":"","preco_unitario":0,"preco_total":0}]
+  const t = raw.trim();
+  if (t.startsWith("[") || t.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(t);
+      const arr = Array.isArray(parsed) ? parsed : [parsed];
+      const itens = arr
+        .filter((o) => o && typeof o === "object")
+        .map((o: Record<string, unknown>) => {
+          const nome =
+            (typeof o["produto"] === "string" && o["produto"]) ||
+            (typeof o["nome"] === "string" && o["nome"]) ||
+            (typeof o["item"] === "string" && o["item"]) ||
+            "Item";
+          const qtd = o["quantidade"] ?? o["qtd"];
+          const unidade = o["unidade"] ?? o["unit"];
+          const unitario = o["preco_unitario"] ?? o["precoUnitario"] ?? o["valor_unitario"];
+          const total = o["preco_total"] ?? o["precoTotal"] ?? o["valor_total"];
+          return {
+            nome: String(nome).trim(),
+            qtd: qtd == null || qtd === "" ? null : num(qtd),
+            unidade:
+              typeof unidade === "string" && unidade.trim() ? unidade.trim() : null,
+            unitario: unitario == null || unitario === "" ? null : num(unitario),
+            total: total == null || total === "" ? null : num(total),
+          };
+        });
+      if (itens.length) return itens;
+    } catch {
+      /* segue para o parser de texto */
+    }
+  }
+
   const hasStructured = raw.includes("Qtd:");
   const parts = hasStructured
     ? raw.split("\n")
     : raw.split(/\n|,(?![^()]*\))/);
+
 
   return parts
     .map((line) => line.trim())
