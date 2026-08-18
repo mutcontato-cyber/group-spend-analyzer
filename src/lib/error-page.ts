@@ -1,4 +1,19 @@
-export function renderErrorPage(): string {
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Set DEBUG_ERRORS=1 on the server (e.g. EasyPanel env) to render the real
+// error detail inside the 500 page instead of the generic message.
+export function renderErrorPage(detail?: string): string {
+  const showDetail =
+    typeof process !== "undefined" && process.env?.["DEBUG_ERRORS"] === "1" && !!detail;
+  const detailBlock = showDetail
+    ? `<pre style="text-align:left;white-space:pre-wrap;word-break:break-word;background:#f3f4f6;padding:1rem;border-radius:0.375rem;font-size:12px;overflow:auto;max-height:60vh">${escapeHtml(detail!)}</pre>`
+    : "";
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -24,6 +39,7 @@ export function renderErrorPage(): string {
         <button class="primary" onclick="location.reload()">Try again</button>
         <a class="secondary" href="/">Go home</a>
       </div>
+      ${detailBlock}
     </div>
   </body>
 </html>`;
