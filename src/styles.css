@@ -149,13 +149,16 @@
 @utility surface-card {
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
 }
 
 @utility surface-hero {
   background-image: var(--gradient-hero);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-xl);
+  color: oklch(0.98 0.003 250);
+}
+
+@utility surface-quiet {
+  background-color: transparent;
+  border-bottom: 1px solid var(--border);
 }
