@@ -1,10 +1,12 @@
-const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
+const BASE_PROD = "https://noiton-n8n.lm218l.easypanel.host/webhook";
+const BASE_TEST = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
 
 export const GRUPOS_ENDPOINTS = {
-  listar: `${BASE}/ver-grupos`,
-  adicionar: `${BASE}/adicionar-grupo`,
-  apagar: `${BASE}/apagar-grupo`,
+  listar: `${BASE_PROD}/ver-grupos`,
+  adicionar: `${BASE_PROD}/adicionar-grupo`,
+  apagar: `${BASE_TEST}/apagar-grupo`,
 } as const;
+
 
 export type Grupo = {
   nome: string;
