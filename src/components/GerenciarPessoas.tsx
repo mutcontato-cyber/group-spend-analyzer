@@ -39,7 +39,7 @@ export function GerenciarPessoas({ grupos }: { grupos: string[] }) {
   const queryClient = useQueryClient();
   const [aberto, setAberto] = useState(false);
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [telefone, setTelefone] = useState("55");
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const [paraExcluir, setParaExcluir] = useState<Pessoa | null>(null);
 
@@ -203,8 +203,11 @@ export function GerenciarPessoas({ grupos }: { grupos: string[] }) {
                   id="pessoa-tel"
                   inputMode="tel"
                   value={telefone}
-                  placeholder="(00) 00000-0000"
-                  onChange={(e) => setTelefone(e.target.value)}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D+/g, "");
+                    setTelefone(digits.startsWith("55") ? digits : `55${digits.replace(/^55/, "")}`);
+                  }}
+                  placeholder="(55) 00 00000-0000"
                   disabled={criar.isPending}
                 />
               </div>
