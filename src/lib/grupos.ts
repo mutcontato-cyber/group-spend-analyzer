@@ -71,15 +71,24 @@ async function parseResposta(res: Response) {
   }
 }
 
+/** Tenta o webhook-test e, se ele não estiver ativo (404), usa o webhook normal. */
+async function fetchComFallback(url: string, init?: RequestInit) {
+  const res = await fetch(url, init);
+  if (res.status === 404 && url.includes("/webhook-test/")) {
+    return fetch(url.replace("/webhook-test/", "/webhook/"), init);
+  }
+  return res;
+}
+
 export async function listarGrupos(): Promise<Grupo[]> {
-  const res = await fetch(GRUPOS_ENDPOINTS.listar, {
+  const res = await fetchComFallback(GRUPOS_ENDPOINTS.listar, {
     headers: { accept: "application/json" },
   });
   return normalizarGrupos(await parseResposta(res));
 }
 
 export async function adicionarGrupo(nome: string): Promise<void> {
-  const res = await fetch(GRUPOS_ENDPOINTS.adicionar, {
+  const res = await fetchComFallback(GRUPOS_ENDPOINTS.adicionar, {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ nome }),
@@ -88,10 +97,11 @@ export async function adicionarGrupo(nome: string): Promise<void> {
 }
 
 export async function apagarGrupo(nome: string): Promise<void> {
-  const res = await fetch(GRUPOS_ENDPOINTS.apagar, {
+  const res = await fetchComFallback(GRUPOS_ENDPOINTS.apagar, {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ nome }),
   });
   await parseResposta(res);
 }
+
