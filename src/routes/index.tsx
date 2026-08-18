@@ -21,10 +21,12 @@ import {
   Filter,
   LayoutDashboard,
   Loader2,
+  LogOut,
   Receipt,
   RefreshCw,
   ShoppingBasket,
   Users,
+  UserRound,
   Wallet,
   FolderCog,
 } from "lucide-react";
@@ -32,7 +34,10 @@ import {
 import { getDespesas } from "@/lib/despesas.functions";
 import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
+import { GerenciarPessoas } from "@/components/GerenciarPessoas";
 import { MetaGasto } from "@/components/MetaGasto";
+import { AuthProvider, useAuth } from "@/components/AuthProvider";
+import { LoginWhatsApp } from "@/components/LoginWhatsApp";
 import { listarGrupos, type Grupo as GrupoCadastrado } from "@/lib/grupos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
