@@ -1,5 +1,5 @@
 const HOST = "https://noiton-n8n.lm218l.easypanel.host";
-const BASE = `${HOST}/webhook-test`;
+const BASE = `${HOST}/webhook`;
 const BASE_PROD = `${HOST}/webhook`;
 
 /** Mesma rota na base de produção (fallback quando o webhook-test não está ativo). */
