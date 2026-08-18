@@ -41,7 +41,7 @@ export const AUTH_ENDPOINTS = {
   validarSessao: `${BASE}/validar-sessao`,
   buscarUsuario: `${BASE}/buscar-usuario`,
   listarPessoas: `${BASE}/ver-pessoas`,
-  adicionarPessoa: `${HOST}/webhook-test/adicionar-pessoa`,
+  adicionarPessoa: `${BASE}/adicionar-pessoa`,
   apagarPessoa: `${BASE}/apagar-pessoa`,
 } as const;
 
@@ -314,18 +314,29 @@ export type Pessoa = Usuario;
 
 export async function listarPessoas(): Promise<Pessoa[]> {
   const json = await get(AUTH_ENDPOINTS.listarPessoas);
-  let rows: unknown[] = [];
-  if (Array.isArray(json)) rows = json;
-  else {
-    const o = obj(json);
-    const arr = [o["data"], o["pessoas"], o["usuarios"], o["rows"], o["result"]].find((v) =>
-      Array.isArray(v),
+
+  const extrair = (v: unknown): unknown[] => {
+    if (Array.isArray(v)) return v.flatMap((x) => (temLista(x) ? extrair(x) : [x]));
+    const o = obj(v);
+    const arr = [o["data"], o["pessoas"], o["usuarios"], o["rows"], o["result"]].find((x) =>
+      Array.isArray(x),
     );
-    rows = Array.isArray(arr) ? arr : [];
-  }
+    return Array.isArray(arr) ? extrair(arr) : [];
+  };
+  const temLista = (v: unknown): boolean => {
+    const o = obj(v);
+    return ["data", "pessoas", "usuarios", "rows", "result"].some((k) => Array.isArray(o[k]));
+  };
+
+  const rows = extrair(json);
+  const vistos = new Set<string>();
   return rows
     .map((r) => normalizarUsuario(r))
-    .filter((p) => p.telefone)
+    .filter((p) => {
+      if (!p.telefone || vistos.has(p.telefone)) return false;
+      vistos.add(p.telefone);
+      return true;
+    })
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 }
 
