@@ -120,7 +120,7 @@ function parseItens(raw: string): Item[] {
 }
 
 export function normalizar(rows: unknown[]): Despesa[] {
-  return (rows as RawDespesa[])
+  const base = (rows as RawDespesa[])
     .filter((r) => r && typeof r === "object")
     .map((r, i) => {
       let dataStr = (r.data ?? "").trim();
