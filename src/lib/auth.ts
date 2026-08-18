@@ -332,7 +332,11 @@ export async function listarPessoas(): Promise<Pessoa[]> {
   const vistos = new Set<string>();
   return rows
     .map((r) => normalizarUsuario(r))
-    .filter((p) => p.telefone)
+    .filter((p) => {
+      if (!p.telefone || vistos.has(p.telefone)) return false;
+      vistos.add(p.telefone);
+      return true;
+    })
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 }
 
