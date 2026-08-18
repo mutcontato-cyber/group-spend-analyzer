@@ -1,4 +1,4 @@
-const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook";
+const BASE = "https://noiton-n8n.lm218l.easypanel.host/webhook-test";
 
 /**
  * Endpoints que precisam existir no n8n.
