@@ -115,25 +115,18 @@ const SECTIONS: { id: SectionId; label: string; icon: React.ElementType }[] = [
 function Kpi({
   label,
   value,
-  icon: Icon,
   hint,
 }: {
   label: string;
   value: string;
-  icon: React.ElementType;
   hint?: string | undefined;
 }) {
   return (
-    <div className="surface-card p-5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {label}
-        </span>
-        <Icon className="size-4 text-primary" />
-      </div>
-      <p className="mt-3 text-2xl font-semibold tabular-nums">{value}</p>
+    <div className="px-4 py-3">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <p className="mt-1 text-lg font-medium tabular-nums">{value}</p>
       {hint ? (
-        <p className="mt-1 truncate text-xs text-muted-foreground">{hint}</p>
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">{hint}</p>
       ) : null}
     </div>
   );
