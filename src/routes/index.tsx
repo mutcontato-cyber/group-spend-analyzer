@@ -511,34 +511,6 @@ function Dashboard() {
               </div>
             ) : (
               <>
-                {filtros}
-
-                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <Kpi
-                    label="Gasto no período"
-                    value={brl(total)}
-                    icon={Wallet}
-                    hint={periodoLabel}
-                  />
-                  <Kpi
-                    label="Lançamentos"
-                    value={String(filtradas.length)}
-                    icon={Receipt}
-                    hint={`${comComprovante} com comprovante`}
-                  />
-                  <Kpi
-                    label="Ticket médio"
-                    value={brl(ticket)}
-                    icon={ArrowUpRight}
-                  />
-                  <Kpi
-                    label="Recebedores"
-                    value={String(recebedores.length)}
-                    icon={Users}
-                    hint={recebedores[0]?.nome}
-                  />
-                </section>
-
                 {grupoAtivo ? (
                   <MetaGasto
                     key={grupoAtivo}
@@ -547,6 +519,29 @@ function Dashboard() {
                     periodoLabel={periodoLabel}
                   />
                 ) : null}
+
+                {filtros}
+
+                <section className="surface-card grid divide-y divide-border sm:grid-cols-2 sm:divide-y-0 xl:grid-cols-4 sm:[&>*+*]:border-l sm:[&>*+*]:border-border">
+                  <Kpi
+                    label="Gasto no período"
+                    value={brl(total)}
+                    hint={periodoLabel}
+                  />
+                  <Kpi
+                    label="Lançamentos"
+                    value={String(filtradas.length)}
+                    hint={`${comComprovante} com comprovante`}
+                  />
+                  <Kpi label="Ticket médio" value={brl(ticket)} />
+                  <Kpi
+                    label="Recebedores"
+                    value={String(recebedores.length)}
+                    hint={recebedores[0]?.nome}
+                  />
+                </section>
+
+
 
 
                 {section === "visao" ? (
