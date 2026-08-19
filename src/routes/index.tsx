@@ -541,7 +541,10 @@ function Dashboard() {
                       <SidebarMenuButton
                         isActive={section === s.id}
                         tooltip={s.label}
-                        onClick={() => setSection(s.id)}
+                        onClick={() => {
+                          setSection(s.id);
+                          setOpen(false);
+                        }}
                       >
                         <s.icon className="size-4" />
                         <span>{s.label}</span>
