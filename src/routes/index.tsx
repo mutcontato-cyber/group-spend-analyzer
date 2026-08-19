@@ -524,9 +524,9 @@ function Dashboard() {
               <img
                 src={logoAsset.url}
                 alt="Gestão Obra"
-                width={32}
-                height={32}
-                className="size-8 shrink-0 rounded-md bg-white object-contain"
+                width={256}
+                height={256}
+                className="size-10 shrink-0 object-contain"
               />
               <div className="min-w-0 group-data-[collapsible=icon]:hidden">
                 <p className="truncate text-sm font-semibold">Gestão Obra</p>
