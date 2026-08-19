@@ -52,6 +52,8 @@ export function MetaGasto({
   const [metas, setMetas] = useState<Metas>({});
   const [aberto, setAberto] = useState(false);
   const [rascunho, setRascunho] = useState("");
+  const [detalhes, setDetalhes] = useState(false);
+
 
   useEffect(() => {
     setMetas(lerMetas());
@@ -157,36 +159,48 @@ export function MetaGasto({
   );
 
   return (
-    <section className="surface-hero p-6 md:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] opacity-70">
+    <section className="surface-hero p-4 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] opacity-70 md:text-xs">
           <Target className="size-4" />
           <span>Meta · {periodoLabel}</span>
         </div>
-        {editar}
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-current opacity-80 hover:bg-white/10 hover:opacity-100 md:hidden"
+            onClick={() => setDetalhes((v) => !v)}
+          >
+            {detalhes ? "Ocultar" : "Detalhes"}
+          </Button>
+          {editar}
+        </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4">
+      <div className="mt-4 flex flex-wrap items-end gap-x-8 gap-y-3 md:mt-6 md:gap-x-10">
         <div>
-          <p className="text-xs uppercase tracking-wider opacity-60">
+          <p className="text-[10px] uppercase tracking-wider opacity-60 md:text-xs">
             Já gastei
           </p>
-          <p className="mt-1 text-4xl font-semibold tabular-nums md:text-5xl">
+          <p className="mt-1 text-3xl font-semibold tabular-nums md:text-5xl">
             {brl(total)}
           </p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wider opacity-60">Meta</p>
-          <p className="mt-1 text-2xl font-medium tabular-nums opacity-80 md:text-3xl">
+          <p className="text-[10px] uppercase tracking-wider opacity-60 md:text-xs">
+            Meta
+          </p>
+          <p className="mt-1 text-xl font-medium tabular-nums opacity-80 md:text-3xl">
             {meta > 0 ? brl(meta) : "—"}
           </p>
         </div>
         {meta > 0 ? (
           <div className="ml-auto text-right">
-            <p className={`text-3xl font-semibold tabular-nums ${acento}`}>
+            <p className={`text-2xl font-semibold tabular-nums md:text-3xl ${acento}`}>
               {pct.toFixed(0)}%
             </p>
-            <p className="text-xs opacity-70">
+            <p className="text-[11px] opacity-70 md:text-xs">
               {restante >= 0
                 ? `restam ${brl(restante)}`
                 : `excedeu ${brl(Math.abs(restante))}`}
@@ -197,13 +211,15 @@ export function MetaGasto({
 
       {meta > 0 ? (
         <>
-          <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-white/15">
+          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/15 md:mt-6">
             <div
               className={`h-full rounded-full transition-all ${barra}`}
               style={{ width: `${Math.min(pct, 100)}%` }}
             />
           </div>
-          <div className="mt-3 flex items-center gap-2 text-sm opacity-90">
+          <div
+            className={`mt-3 items-center gap-2 text-sm opacity-90 ${detalhes ? "flex" : "hidden md:flex"}`}
+          >
             {status === "estourou" ? (
               <>
                 <AlertTriangle className="size-4 text-destructive" />
@@ -223,7 +239,9 @@ export function MetaGasto({
           </div>
         </>
       ) : (
-        <p className="mt-5 text-sm opacity-70">
+        <p
+          className={`mt-4 text-sm opacity-70 ${detalhes ? "block" : "hidden md:block"}`}
+        >
           Nenhuma meta definida para este grupo. Defina um limite (ex.: R$
           2.000) e acompanhe o quanto já foi gasto.
         </p>
@@ -231,3 +249,4 @@ export function MetaGasto({
     </section>
   );
 }
+
