@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Loader2, MessageCircle, ShieldCheck, Wallet } from "lucide-react";
+import { Loader2, MessageCircle, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
+import logoAsset from "@/assets/logo.png.asset.json";
 import {
   enviarCodigo,
   formatarTelefone,
