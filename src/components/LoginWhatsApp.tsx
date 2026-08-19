@@ -60,11 +60,15 @@ export function LoginWhatsApp({ onEntrar }: { onEntrar: (s: Sessao) => void }) {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wallet className="size-5" />
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="Gestão Obra"
+            width={40}
+            height={40}
+            className="size-10 rounded-lg bg-white object-contain"
+          />
           <div>
-            <h1 className="text-base font-semibold">Painel financeiro</h1>
+            <h1 className="text-base font-semibold">Gestão Obra</h1>
             <p className="text-xs text-muted-foreground">Acesso por WhatsApp</p>
           </div>
         </div>
