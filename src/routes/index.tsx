@@ -19,6 +19,9 @@ import {
   Check,
   ChevronsUpDown,
   Filter,
+  SlidersHorizontal,
+  X,
+
   LayoutDashboard,
   Loader2,
   LogOut,
