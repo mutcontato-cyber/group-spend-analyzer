@@ -74,6 +74,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/")({
