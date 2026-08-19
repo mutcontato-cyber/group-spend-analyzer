@@ -30,11 +30,11 @@ import {
   ShoppingBasket,
   Users,
   UserRound,
-  Wallet,
   FolderCog,
 } from "lucide-react";
 
 import { getDespesas } from "@/lib/despesas.functions";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
 import { GerenciarPessoas } from "@/components/GerenciarPessoas";
@@ -519,12 +519,16 @@ function Dashboard() {
         <Sidebar collapsible="icon">
           <SidebarHeader className="gap-3 p-3">
             <div className="flex items-center gap-2">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                <Wallet className="size-4" />
-              </div>
+              <img
+                src={logoAsset.url}
+                alt="Gestão Obra"
+                width={32}
+                height={32}
+                className="size-8 shrink-0 rounded-md bg-white object-contain"
+              />
               <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-                <p className="truncate text-sm font-semibold">Painel financeiro</p>
-                <p className="truncate text-xs opacity-70">Análise de gastos</p>
+                <p className="truncate text-sm font-semibold">Gestão Obra</p>
+                <p className="truncate text-xs opacity-70">Painel financeiro</p>
               </div>
             </div>
 
