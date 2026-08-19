@@ -80,13 +80,13 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard Financeiro | Controle de Gastos por Grupo" },
+      { title: "Gestão Obra | Dashboard Financeiro" },
       {
         name: "description",
         content:
           "Painel financeiro que analisa gastos por grupo, período, recebedores e itens mais comprados, com dados sincronizados da planilha.",
       },
-      { property: "og:title", content: "Dashboard Financeiro por Grupo" },
+      { property: "og:title", content: "Gestão Obra | Dashboard Financeiro" },
       {
         property: "og:description",
         content:
