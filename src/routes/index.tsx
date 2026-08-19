@@ -566,17 +566,13 @@ function Dashboard() {
                 <SidebarMenu>
                   {secoesVisiveis.map((s) => (
                     <SidebarMenuItem key={s.id}>
-                      <SidebarMenuButton
-                        isActive={section === s.id}
-                        tooltip={s.label}
-                        onClick={() => {
-                          setSection(s.id);
-                          setOpen(false);
-                        }}
-                      >
-                        <s.icon className="size-4" />
-                        <span>{s.label}</span>
-                      </SidebarMenuButton>
+                      <NavItemButton
+                        active={section === s.id}
+                        label={s.label}
+                        icon={s.icon}
+                        onSelect={() => setSection(s.id)}
+                      />
+
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
