@@ -223,6 +223,7 @@ function Dashboard() {
     return lista;
   }, [despesas, gruposCadastrados, isAdmin, usuario]);
 
+  const [section, setSection] = useState<SectionId>("visao");
   const [grupo, setGrupo] = useState<string | null>(null);
   const [ano, setAno] = useState<string>(TODOS);
   const [mes, setMes] = useState<string>(TODOS);
