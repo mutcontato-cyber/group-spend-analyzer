@@ -93,7 +93,9 @@ export const Route = createFileRoute("/")({
           "Analise gastos por mês, ano e dia, veja itens mais comprados e recebedores em cada grupo.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://group-spend-analyzer.lovable.app/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://group-spend-analyzer.lovable.app/og-image.png" },
     ],
   }),
   component: PainelPage,
@@ -522,9 +524,9 @@ function Dashboard() {
               <img
                 src={logoAsset.url}
                 alt="Gestão Obra"
-                width={32}
-                height={32}
-                className="size-8 shrink-0 rounded-md bg-white object-contain"
+                width={256}
+                height={256}
+                className="size-10 shrink-0 object-contain"
               />
               <div className="min-w-0 group-data-[collapsible=icon]:hidden">
                 <p className="truncate text-sm font-semibold">Gestão Obra</p>
