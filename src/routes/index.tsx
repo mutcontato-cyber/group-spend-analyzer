@@ -74,6 +74,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/")({
@@ -173,6 +174,7 @@ function Kpi({
 function Dashboard() {
   const { usuario, sair } = useAuth();
   const isAdmin = usuario?.papel === "admin";
+  const { setOpen } = useSidebar();
   const secoesVisiveis = SECTIONS.filter((s) => !s.adminOnly || isAdmin);
   const fetchDespesas = useServerFn(getDespesas);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -221,11 +223,10 @@ function Dashboard() {
     return lista;
   }, [despesas, gruposCadastrados, isAdmin, usuario]);
 
-  const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
   const [grupo, setGrupo] = useState<string | null>(null);
-  const [ano, setAno] = useState<string>(String(hoje.getFullYear()));
-  const [mes, setMes] = useState<string>(String(hoje.getMonth() + 1));
+  const [ano, setAno] = useState<string>(TODOS);
+  const [mes, setMes] = useState<string>(TODOS);
   const [dia, setDia] = useState<string>(TODOS);
   const [busca, setBusca] = useState("");
   const [metodo, setMetodo] = useState<string>(TODOS);
@@ -540,7 +541,10 @@ function Dashboard() {
                       <SidebarMenuButton
                         isActive={section === s.id}
                         tooltip={s.label}
-                        onClick={() => setSection(s.id)}
+                        onClick={() => {
+                          setSection(s.id);
+                          setOpen(false);
+                        }}
                       >
                         <s.icon className="size-4" />
                         <span>{s.label}</span>
