@@ -171,10 +171,38 @@ function Kpi({
   );
 }
 
+function NavItemButton({
+  active,
+  label,
+  icon: Icon,
+  onSelect,
+}: {
+  active: boolean;
+  label: string;
+  icon: React.ElementType;
+  onSelect: () => void;
+}) {
+  const { setOpen, setOpenMobile } = useSidebar();
+  return (
+    <SidebarMenuButton
+      isActive={active}
+      tooltip={label}
+      onClick={() => {
+        onSelect();
+        setOpen(false);
+        setOpenMobile(false);
+      }}
+    >
+      <Icon className="size-4" />
+      <span>{label}</span>
+    </SidebarMenuButton>
+  );
+}
+
 function Dashboard() {
   const { usuario, sair } = useAuth();
   const isAdmin = usuario?.papel === "admin";
-  const { setOpen } = useSidebar();
+
   const secoesVisiveis = SECTIONS.filter((s) => !s.adminOnly || isAdmin);
   const fetchDespesas = useServerFn(getDespesas);
   const { data, isLoading, error, refetch, isFetching } = useQuery({
@@ -538,17 +566,13 @@ function Dashboard() {
                 <SidebarMenu>
                   {secoesVisiveis.map((s) => (
                     <SidebarMenuItem key={s.id}>
-                      <SidebarMenuButton
-                        isActive={section === s.id}
-                        tooltip={s.label}
-                        onClick={() => {
-                          setSection(s.id);
-                          setOpen(false);
-                        }}
-                      >
-                        <s.icon className="size-4" />
-                        <span>{s.label}</span>
-                      </SidebarMenuButton>
+                      <NavItemButton
+                        active={section === s.id}
+                        label={s.label}
+                        icon={s.icon}
+                        onSelect={() => setSection(s.id)}
+                      />
+
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
