@@ -428,8 +428,59 @@ function Dashboard() {
           />
         </div>
       </div>
-    </section>
+      </section>
+    </div>
   );
+
+  const filtrosAtivos =
+    (ano === TODOS ? 0 : 1) +
+    (mes === TODOS ? 0 : 1) +
+    (dia === TODOS ? 0 : 1) +
+    (metodo === TODOS ? 0 : 1) +
+    (busca.trim() ? 1 : 0);
+
+  const filtros = (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 md:hidden">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1 justify-between"
+          onClick={() => setFiltrosAbertos((v) => !v)}
+        >
+          <span className="flex items-center gap-2">
+            <SlidersHorizontal className="size-4" />
+            Filtros
+            {filtrosAtivos > 0 ? (
+              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                {filtrosAtivos}
+              </span>
+            ) : null}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {filtrosAbertos ? "Fechar" : "Abrir"}
+          </span>
+        </Button>
+        {filtrosAtivos > 0 ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setAno(TODOS);
+              setMes(TODOS);
+              setDia(TODOS);
+              setMetodo(TODOS);
+              setBusca("");
+            }}
+          >
+            <X className="size-4" />
+          </Button>
+        ) : null}
+      </div>
+      {filtrosCampos}
+    </div>
+  );
+
 
   return (
     <SidebarProvider>
