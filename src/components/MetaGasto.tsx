@@ -52,6 +52,8 @@ export function MetaGasto({
   const [metas, setMetas] = useState<Metas>({});
   const [aberto, setAberto] = useState(false);
   const [rascunho, setRascunho] = useState("");
+  const [detalhes, setDetalhes] = useState(false);
+
 
   useEffect(() => {
     setMetas(lerMetas());
