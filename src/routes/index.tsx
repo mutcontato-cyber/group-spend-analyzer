@@ -225,8 +225,8 @@ function Dashboard() {
   const hoje = new Date();
   const [section, setSection] = useState<SectionId>("visao");
   const [grupo, setGrupo] = useState<string | null>(null);
-  const [ano, setAno] = useState<string>(String(hoje.getFullYear()));
-  const [mes, setMes] = useState<string>(String(hoje.getMonth() + 1));
+  const [ano, setAno] = useState<string>(TODOS);
+  const [mes, setMes] = useState<string>(TODOS);
   const [dia, setDia] = useState<string>(TODOS);
   const [busca, setBusca] = useState("");
   const [metodo, setMetodo] = useState<string>(TODOS);
