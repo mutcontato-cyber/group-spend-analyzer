@@ -179,7 +179,7 @@ function NavItemButton({
 }: {
   active: boolean;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
   onSelect: () => void;
 }) {
   const { setOpen, setOpenMobile } = useSidebar();
