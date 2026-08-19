@@ -229,6 +229,8 @@ function Dashboard() {
   const [dia, setDia] = useState<string>(TODOS);
   const [busca, setBusca] = useState("");
   const [metodo, setMetodo] = useState<string>(TODOS);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+
 
   const grupoAtivo = grupo ?? grupos[0] ?? null;
   const doGrupo = useMemo(
