@@ -30,7 +30,6 @@ import {
   ShoppingBasket,
   Users,
   UserRound,
-  Wallet,
   FolderCog,
 } from "lucide-react";
 
