@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 
 import { getDespesas } from "@/lib/despesas.functions";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { normalizar, MESES, brl, recebedorEhConhecido, nomesProdutos, formatarDataHora, type Despesa } from "@/lib/despesas";
 import { GerenciarGrupos } from "@/components/GerenciarGrupos";
 import { GerenciarPessoas } from "@/components/GerenciarPessoas";
