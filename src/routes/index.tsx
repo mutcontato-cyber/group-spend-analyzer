@@ -350,8 +350,10 @@ function Dashboard() {
     color: "var(--popover-foreground)",
   };
 
-  const filtros = (
-    <section className="surface-card grid gap-3 p-4 md:grid-cols-5">
+  const filtrosCampos = (
+    <div className={filtrosAbertos ? "block" : "hidden md:block"}>
+      <section className="surface-card grid gap-3 p-4 md:grid-cols-5">
+
       <div>
         <label className="text-xs text-muted-foreground">Ano</label>
         <Select value={ano} onValueChange={setAno}>
